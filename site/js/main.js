@@ -83,6 +83,25 @@ function paintRecent() {
 
 /* ---------------------------------------------------------------- helpers */
 
+/** Names for avatars that are no longer sold anywhere (scene/archive lists). */
+let namesPromise = null;
+function loadNames() {
+  if (!namesPromise) {
+    namesPromise = fetch('data/avatar-names.tsv')
+      .then((r) => (r.ok ? r.text() : ''))
+      .then((text) => {
+        const map = new Map();
+        for (const line of text.split('\n').slice(1)) {
+          const [sku, name, region] = line.split('\t');
+          if (sku && name) map.set(sku, { name, region });
+        }
+        return map;
+      })
+      .catch(() => new Map());
+  }
+  return namesPromise;
+}
+
 async function ensureIndex() {
   if (state.indexReady) return;
   if (!state.indexPromise) {
@@ -168,7 +187,13 @@ async function run(rawInput, region) {
         sourceName = data?.name || null;
       } catch { /* no name to match on */ }
       const found = await regionHunt(error.payload.base, home, sourceName);
-      renderMessage(el.message, messageFor(error, found), 'error');
+      let text = messageFor(error, found);
+      if (!found.length) {
+        const names = await loadNames();
+        const hit = names.get(error.payload.base);
+        if (hit) text += `\nKnown as: “${hit.name}” (${hit.region} listing, delisted).`;
+      }
+      renderMessage(el.message, text, 'error');
     } else {
       renderMessage(el.message, messageFor(error), 'error');
     }
