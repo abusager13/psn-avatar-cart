@@ -214,6 +214,12 @@ async function findTwin(base, home, targetRegion) {
 }
 
 /** Probe every region for this product, streaming rows back as they land. */
+/** Build a card for a SKU from a store that does sell it. */
+export async function cardFromRegion(base, region, extra = {}) {
+  const data = await fetchCatalog(base, region);
+  return toCard(data, region, { baseSku: base, ...extra });
+}
+
 export async function availability(base, sourceName, home, onRow) {
   const queue = REGIONS.map((r) => r.code);
   const worker = async () => {

@@ -469,24 +469,7 @@ td.a { text-align: right; }
   border-radius: 12px;
   overflow: hidden;
 }
-.av-thumb { aspect-ratio: 1 / 1; background: var(--panel-hi); }
-.av-thumb.loading {
-  background-image: linear-gradient(100deg, var(--panel-hi) 30%, #232936 50%, var(--panel-hi) 70%);
-  background-size: 200% 100%;
-  animation: shimmer 1.2s linear infinite;
-}
-@keyframes shimmer {
-  from { background-position: 150% 0; }
-  to { background-position: -50% 0; }
-}
-.av-img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  background: var(--panel-hi);
-}
-.av-body { display: flex; flex-direction: column; gap: 5px; padding: 10px 12px 12px; flex: 1; }
+.av-body { display: flex; flex-direction: column; gap: 5px; padding: 12px 12px 10px; flex: 1; }
 .av-name {
   margin: 0;
   font-size: 12.5px;
