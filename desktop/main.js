@@ -219,6 +219,25 @@ function messageFor(err, regions) {
 
 let win = null;
 
+// Only the app's own bundle may drive IPC.
+function trustedSender(event) {
+  try {
+    const frame = event.senderFrame;
+    if (!frame) return false;
+    const url = new URL(frame.url);
+    return url.protocol === 'app:' && url.host === 'bundle';
+  } catch {
+    return false;
+  }
+}
+
+const ipcRegister = ipcMain.handle.bind(ipcMain);
+const handle = (channel, fn) =>
+  ipcRegister(channel, (event, ...args) => {
+    if (!trustedSender(event)) throw new Error('blocked: untrusted IPC sender');
+    return fn(event, ...args);
+  });
+
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true } },
 ]);
@@ -255,10 +274,49 @@ function createWindow() {
     }
   });
 
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (typeof url === 'string' && url.startsWith('https://checkout.playstation.com/')) {
+      shell.openExternal(url);
+    }
+    return { action: 'deny' };
+  });
+
+  win.webContents.on('will-navigate', (event, url) => {
+    if (!url.startsWith('app://bundle/')) event.preventDefault();
+  });
+
+  if (process.argv.includes('--ipc-selftest')) {
+    win.webContents.once('did-finish-load', async () => {
+      try {
+        const report = await win.webContents.executeJavaScript(`(async () => {
+          const api = window.api || {};
+          let pasteCall = 'ok';
+          try { await api.paste(); } catch (e) { pasteCall = 'ERR ' + e.message; }
+          const probe = async (p) => {
+            try { const r = await fetch(p); return r.status; } catch (e) { return 'throw'; }
+          };
+          return {
+            keys: Object.keys(api).sort(),
+            hasPaste: typeof api.paste === 'function',
+            pasteCall,
+            traversal: await probe('app://bundle/%2e%2e/%2e%2e/etc/passwd'),
+            encodedEscape: await probe('app://bundle/..%2fpackage.json'),
+            siblingPrefix: await probe('app://bundle/..%2fdist-evil%2fsecret.txt'),
+            normal: await probe('app://bundle/index.html'),
+          };
+        })()`);
+        console.log('IPC_SELFTEST ' + JSON.stringify(report));
+      } catch (err) {
+        console.log('IPC_SELFTEST ERROR ' + err.message);
+      }
+      app.quit();
+    });
+  }
+
   win.on('closed', () => { win = null; });
 }
 
-ipcMain.handle('resolve', async (_e, { input, region }) => {
+handle('resolve', async (_e, { input, region }) => {
   try {
     const card = await resolve(input, region);
     return { ok: true, card };
@@ -288,7 +346,7 @@ ipcMain.handle('resolve', async (_e, { input, region }) => {
   }
 });
 
-ipcMain.handle('open', (_e, url) => {
+handle('open', (_e, url) => {
   if (typeof url === 'string' && url.startsWith('https://checkout.playstation.com/')) {
     shell.openExternal(url);
     return true;
@@ -296,7 +354,7 @@ ipcMain.handle('open', (_e, url) => {
   return false;
 });
 
-ipcMain.handle('paste', () => clipboard.readText());
+handle('paste', () => clipboard.readText());
 
 // A PSNA .edat keeps its content ID in plaintext at offset 0x10, so a file
 // is enough to recover the store SKU even when the hash is not in our index.
@@ -321,7 +379,7 @@ function decodeEdat(filePath) {
   }
 }
 
-ipcMain.handle('pick-edat', async () => {
+handle('pick-edat', async () => {
   const result = await dialog.showOpenDialog(win, {
     title: 'Open a PSNA .edat file',
     filters: [{ name: 'PSNA avatar', extensions: ['edat'] }],
@@ -331,12 +389,12 @@ ipcMain.handle('pick-edat', async () => {
   return decodeEdat(result.filePaths[0]);
 });
 
-ipcMain.handle('copy', (_e, text) => {
+handle('copy', (_e, text) => {
   clipboard.writeText(String(text || ''));
   return true;
 });
 
-ipcMain.handle('resize', (_e, height) => {
+handle('resize', (_e, height) => {
   if (!win) return;
   const bounds = win.getBounds();
   const clamped = Math.max(420, Math.min(1100, Math.round(height)));
@@ -345,7 +403,7 @@ ipcMain.handle('resize', (_e, height) => {
   }
 });
 
-ipcMain.handle('snapshot-ready', async () => {
+handle('snapshot-ready', async () => {
   if (!snapPath) return;
   await new Promise((r) => setTimeout(r, 700));
   const image = await win.webContents.capturePage();
@@ -358,9 +416,14 @@ app.whenReady().then(() => {
   protocol.handle('app', (request) => {
     const parsed = new URL(request.url);
     const relative = decodeURIComponent(parsed.pathname === '/' ? '/index.html' : parsed.pathname);
-    const target = path.join(__dirname, 'dist', relative);
-    if (!target.startsWith(path.join(__dirname, 'dist'))) {
+    const distRoot = path.join(__dirname, 'dist');
+    const target = path.resolve(distRoot, relative.replace(/^\/+/, ''));
+    const contained = path.relative(distRoot, target);
+    if (contained.startsWith('..') || path.isAbsolute(contained)) {
       return new Response('forbidden', { status: 403 });
+    }
+    if (!fs.existsSync(target) || !fs.statSync(target).isFile()) {
+      return new Response('not found', { status: 404 });
     }
     return net.fetch(pathToFileURL(target).toString());
   });
