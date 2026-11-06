@@ -3,7 +3,7 @@
 import { initCore, core } from './wasm.js';
 import { REGIONS } from './catalog.js';
 
-const CATALOG_URL = 'data/live-catalog.tsv?v=__V__';
+const CATALOG_URL = 'data/browse-catalog.tsv?v=__V__';
 const PAGE = 48;
 const IMAGE_CONCURRENCY = 6;
 
@@ -34,9 +34,9 @@ async function loadCatalog() {
   const lines = text.split('\n');
   const rows = [];
   for (let i = 1; i < lines.length; i += 1) {
-    const [sku, name, price, region] = lines[i].split('\t');
-    if (!sku || !region) continue;
-    rows.push({ sku, name: name || '', price: price || '', region });
+    const [sku, name, price, regions] = lines[i].split('\t');
+    if (!sku || !regions) continue;
+    rows.push({ sku, name: name || '', price: price || '', regions: regions.split(' ') });
   }
   return rows;
 }
@@ -91,7 +91,7 @@ async function fetchImage({ card, sku, region }) {
 function apply() {
   const q = state.query.trim().toLowerCase();
   state.matched = state.rows.filter((row) => {
-    if (state.region && row.region !== state.region) return false;
+    if (state.region && !row.regions.includes(state.region)) return false;
     if (!q) return true;
     return row.name.toLowerCase().includes(q) || row.sku.toLowerCase().includes(q);
   });
@@ -107,7 +107,7 @@ function renderCount() {
   const n = state.matched.length;
   el.count.textContent = state.query || state.region
     ? `${n.toLocaleString()} of ${total.toLocaleString()} listings`
-    : `${total.toLocaleString()} listings across ${new Set(state.rows.map((r) => r.region)).size} stores`;
+    : `${total.toLocaleString()} avatars across 14 stores`;
 }
 
 function renderMore() {
@@ -124,7 +124,7 @@ function card(row) {
     <div class="av-thumb"></div>
     <div class="av-body">
       <h3 class="av-name">${esc(row.name || '(unnamed)')}</h3>
-      <p class="av-meta"><span class="av-region">${esc(row.region)}</span>
+      <p class="av-meta"><span class="av-region">${esc(row.regions.join(' '))}</span>
         <span class="av-price">${esc(row.price || '—')}</span></p>
       <code class="av-sku">${esc(row.sku)}</code>
     </div>
@@ -142,7 +142,7 @@ function card(row) {
       button.textContent = 'Copy failed';
     }
   });
-  requestImage(article, row.sku, row.region);
+  requestImage(article, row.sku, row.regions[0]);
   return article;
 }
 
