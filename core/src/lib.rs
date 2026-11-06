@@ -63,6 +63,22 @@ fn out(s: &str, dst: *mut u8, cap: usize) -> i32 {
 
 // ---------------------------------------------------------------- input rules
 
+
+/// Cyrillic and Greek letters that render identically to ASCII ones. Hashes
+/// copied out of web pages or typed on a non-Latin layout pick these up, and a
+/// single one is enough to make a valid hash fail every format check.
+fn fold_lookalike(c: char) -> char {
+    match c {
+        'А' => 'A', 'В' => 'B', 'С' => 'C', 'Е' => 'E', 'Н' => 'H', 'К' => 'K',
+        'М' => 'M', 'О' => 'O', 'Р' => 'P', 'Т' => 'T', 'У' => 'Y', 'Х' => 'X',
+        'а' => 'a', 'с' => 'c', 'е' => 'e', 'о' => 'o', 'р' => 'p', 'х' => 'x', 'у' => 'y',
+        'Α' => 'A', 'Β' => 'B', 'Ε' => 'E', 'Ζ' => 'Z', 'Η' => 'H', 'Ι' => 'I',
+        'Κ' => 'K', 'Μ' => 'M', 'Ν' => 'N', 'Ο' => 'O', 'Ρ' => 'P', 'Τ' => 'T',
+        'Υ' => 'Y', 'Χ' => 'X',
+        other => other,
+    }
+}
+
 /// Trim, upper-case, and drop the `PSNA_` / `.edat` decoration people paste in.
 #[unsafe(no_mangle)]
 pub extern "C" fn normalize_input(p: *const u8, l: usize, dst: *mut u8, cap: usize) -> i32 {
@@ -75,8 +91,27 @@ pub extern "C" fn normalize_input(p: *const u8, l: usize, dst: *mut u8, cap: usi
     // ever ASCII alphanumerics, dashes and underscores, so drop everything else.
     let cleaned: String = s
         .chars()
+        .map(fold_lookalike)
         .filter(|c| c.is_ascii_alphanumeric() || *c == '-' || *c == '_')
         .collect();
+
+    // A PSNA hash is 40 hex characters. If that is what we are looking at, a
+    // letter O/I/L where the hash needs 0/1 is a reader's transcription slip,
+    // not a different product, so repair it. Safe: only applies at length 40.
+    if cleaned.len() == 40 {
+        let repaired: String = cleaned
+            .chars()
+            .map(|c| match c {
+                'O' => '0',
+                'I' | 'L' => '1',
+                other => other,
+            })
+            .collect();
+        if repaired.chars().all(|c| c.is_ascii_hexdigit()) {
+            return out(&repaired, dst, cap);
+        }
+    }
+
     out(cleaned.trim(), dst, cap)
 }
 
