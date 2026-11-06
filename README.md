@@ -5,6 +5,8 @@ PlayStation Store cart link — for PS3-era avatars that the web store no longer
 
 Public repo · macOS + Windows · React Native (react-native-web) UI in an Electron shell
 
+**[Open the web version →](https://abusager13.github.io/psn-avatar-cart/)** — runs in the browser, nothing to install.
+
 ![Result view](docs/result-us.png)
 
 ## What it does
@@ -27,6 +29,16 @@ password — the link only fills your cart, and you confirm and pay on PlayStati
 | US result | Region hunt |
 |---|---|
 | ![US](docs/result-us.png) | ![EU-only item](docs/region-hunt.png) |
+
+## Web version
+
+The same tool runs as a static site — no install, no backend:
+
+**https://abusager13.github.io/psn-avatar-cart/**
+
+It works because Sony's catalog endpoint sends `Access-Control-Allow-Origin: *`, so the browser can
+query it directly. The site is plain HTML/CSS/JS in [`site/`](site/); GitHub Pages serves it via
+[`pages.yml`](.github/workflows/pages.yml), which copies the SKU index in at deploy time.
 
 ## Run it
 
