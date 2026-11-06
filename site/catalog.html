@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Browse avatars — PSN Avatar Cart</title>
+    <meta name="description" content="Search every PlayStation avatar we know the SKU for, across 14 store regions." />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  </head>
+  <body>
+    <main id="app" class="wide">
+      <header class="hero">
+        <p class="crumb"><a href="./">← PSN Avatar Cart</a></p>
+        <h1>Browse avatars</h1>
+        <p class="tagline" id="lede">Loading the catalogue…</p>
+      </header>
+
+      <section class="tool">
+        <div class="row">
+          <label class="field">
+            <span class="sr-only">Search by name or SKU</span>
+            <input id="q" type="search" placeholder="Search by name or SKU…" autocomplete="off" spellcheck="false" />
+          </label>
+          <button id="clear" class="btn ghost" type="button">Clear</button>
+        </div>
+        <div id="regions" class="chips" role="group" aria-label="Filter by region"></div>
+        <p id="count" class="count"></p>
+      </section>
+
+      <section id="results" class="grid" aria-live="polite"></section>
+
+      <div class="more-wrap">
+        <button id="more" class="btn ghost hidden" type="button">Load more</button>
+      </div>
+
+      <footer class="foot">
+        <p>
+          Names and prices come from Sony's catalogue for each region; the SKU is the product ID the
+          Store itself uses. Artwork is fetched live, one item at a time, only for cards you can see.
+        </p>
+        <p class="tiny">
+          Unofficial fan tool. Not affiliated with, endorsed by, or sponsored by Sony Interactive
+          Entertainment. Prices shown are per-region and not directly comparable.
+        </p>
+      </footer>
+    </main>
+    <script type="module" src="js/browse.js"></script>
+  </body>
+</html>
