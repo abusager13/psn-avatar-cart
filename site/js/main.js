@@ -9,7 +9,7 @@ import {
   renderRecent, setRecentVisible, renderCountdown,
 } from './ui.js';
 
-const INDEX_URL = 'data/avatar-sku-index.tsv';
+const INDEX_URL = 'data/avatar-sku-index.tsv?v=__V__';
 const RECENT_KEY = 'psnacart.recent.v1';
 const MAX_RECENT = 8;
 
@@ -87,7 +87,7 @@ function paintRecent() {
 let namesPromise = null;
 function loadNames() {
   if (!namesPromise) {
-    namesPromise = fetch('data/avatar-names.tsv')
+    namesPromise = fetch('data/avatar-names.tsv?v=__V__')
       .then((r) => (r.ok ? r.text() : ''))
       .then((text) => {
         const map = new Map();
@@ -357,7 +357,7 @@ async function boot() {
   paintRecent();
 
   try {
-    await initCore();
+    await initCore('wasm/psn_core.wasm?v=__V__');
   } catch (error) {
     renderMessage(el.message, `The Rust/WASM core failed to load (${error.message}).`, 'error');
     return;

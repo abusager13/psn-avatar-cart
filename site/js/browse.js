@@ -3,7 +3,7 @@
 import { initCore, core } from './wasm.js';
 import { REGIONS } from './catalog.js';
 
-const CATALOG_URL = 'data/live-catalog.tsv';
+const CATALOG_URL = 'data/live-catalog.tsv?v=__V__';
 const PAGE = 48;
 const IMAGE_CONCURRENCY = 6;
 
@@ -201,7 +201,7 @@ el.more.addEventListener('click', renderPage);
 
 async function boot() {
   try {
-    await initCore();
+    await initCore('wasm/psn_core.wasm?v=__V__');
   } catch (error) {
     el.lede.textContent = `The Rust/WASM core failed to load (${error.message}).`;
     return;
