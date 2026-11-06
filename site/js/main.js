@@ -2,7 +2,7 @@
 
 import { initCore, core, ERR } from './wasm.js';
 import {
-  REGIONS, LookupError, isRegion, loadIndex, resolveInput, availability,
+  REGIONS, LookupError, isRegion, loadIndex, resolveInput, availability, cardFromRegion,
 } from './catalog.js';
 import {
   renderChips, renderMessage, renderEmpty, renderCard, renderRegionRows,
@@ -221,6 +221,26 @@ async function run(rawInput, region) {
         if (hit) text += `\nKnown as: “${hit.name}” (${hit.region} listing, delisted).`;
       }
       renderMessage(el.message, text, 'error');
+
+      // The avatar exists, just not in the chosen store: show its artwork and
+      // real price from a store that does sell it, rather than only a sentence.
+      if (found.length) {
+        try {
+          const elsewhere = found[0];
+          const card = await cardFromRegion(error.payload.base, elsewhere, {
+            source: `Listed in ${elsewhere}`,
+            hash: error.payload.hash || null,
+          });
+          state.card = card;
+          renderCard(el.card, card, `Not sold in ${region} — showing the ${elsewhere} listing.`, {
+            copy: copyText,
+            copyShare: () => copyText(shareUrl()),
+          });
+          showPermalink();
+          startAvailability(card, value, region);
+          return;
+        } catch { /* fall through to the empty card */ }
+      }
     } else {
       renderMessage(el.message, messageFor(error), 'error');
     }

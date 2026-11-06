@@ -1,11 +1,11 @@
-// Catalogue browser: search the merged live catalogue, lazily fetch artwork.
+// Catalogue browser: search the merged catalogue. Text only — the artwork lives
+// on the main lookup, where one item is resolved rather than hundreds listed.
 
 import { initCore, core } from './wasm.js';
 import { REGIONS } from './catalog.js';
 
 const CATALOG_URL = 'data/browse-catalog.tsv?v=__V__';
 const PAGE = 48;
-const IMAGE_CONCURRENCY = 6;
 
 const el = {
   q: document.getElementById('q'),
@@ -39,75 +39,6 @@ async function loadCatalog() {
     rows.push({ sku, name: name || '', price: price || '', regions: regions.split(' ') });
   }
   return rows;
-}
-
-/* ---------------------------------------------------------------- artwork */
-
-const imageQueue = [];
-let active = 0;
-
-const observer = 'IntersectionObserver' in window
-  ? new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        observer.unobserve(entry.target);
-        const job = entry.target.__job;
-        if (job) { imageQueue.push(job); pump(); }
-      }
-    }, { rootMargin: '200px' })
-  : null;
-
-function requestImage(card, sku, region) {
-  const job = { card, sku, region };
-  const thumb = card.querySelector('.av-thumb');
-  if (thumb) thumb.classList.add('loading');
-  if (observer && thumb) {
-    thumb.__job = job;
-    observer.observe(thumb);
-    return;
-  }
-  imageQueue.push(job);
-  pump();
-}
-
-function pump() {
-  while (active < IMAGE_CONCURRENCY && imageQueue.length) {
-    const job = imageQueue.shift();
-    active += 1;
-    fetchImage(job).finally(() => {
-      active -= 1;
-      pump();
-    });
-  }
-}
-
-async function fetchImage({ card, sku, region }) {
-  const url = `https://store.playstation.com/store/api/chihiro/00_09_000/container/${region}/en/19/${sku}/`;
-  try {
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
-    if (!res.ok) return;
-    const data = await res.json();
-    const img = (data.images || []).slice(-1)[0];
-    if (!img || !img.url) return;
-    const parsed = new URL(img.url);
-    if (parsed.protocol !== 'https:') return;
-    const host = parsed.hostname.toLowerCase();
-    if (!host.endsWith('.playstation.net') && !host.endsWith('.playstation.com')) return;
-    const image = new Image();
-    image.className = 'av-img';
-    image.loading = 'lazy';
-    image.referrerPolicy = 'no-referrer';
-    image.alt = '';
-    image.onload = () => card.querySelector('.av-thumb')?.replaceWith(image);
-
-    const priceEl = card.querySelector('.av-price');
-    const shown = (priceEl?.textContent || '').trim();
-    const real = (data.default_sku || {}).display_price;
-    if (priceEl && real && (!shown || shown === '—')) priceEl.textContent = real;
-    image.src = img.url;
-  } catch {
-    card.querySelector('.av-thumb')?.classList.remove('loading');
-  }
 }
 
 /* ---------------------------------------------------------------- render */
@@ -145,7 +76,6 @@ function card(row) {
   article.className = 'av';
   const link = core.cartLink(row.sku).value || '#';
   article.innerHTML = `
-    <div class="av-thumb"></div>
     <div class="av-body">
       <h3 class="av-name">${esc(row.name || '(unnamed)')}</h3>
       <p class="av-meta"><span class="av-region">${esc(row.regions.join(' '))}</span>
@@ -166,7 +96,6 @@ function card(row) {
       button.textContent = 'Copy failed';
     }
   });
-  requestImage(article, row.sku, row.regions[0]);
   return article;
 }
 
