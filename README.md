@@ -21,6 +21,10 @@ Static site. No install, no login, no backend.
 5. **Cart** — builds `checkout.playstation.com/add/<SKU>?clientId=…` and opens it in a new tab.
 6. **Shareable** — every lookup becomes a permalink (`?hash=…&region=…`) and recent lookups are
    kept in this browser only.
+7. **Shutdown countdown** — a live timer for the selected store plus a "closes …" line per region,
+   from Sony's published schedule ([PlayStation.Blog, 1 Jul 2026](https://blog.playstation.com/2026/07/01/an-update-on-playstation-store-for-ps3-and-ps-vita/)):
+   Mexico/Honduras/Nicaragua August 2026, other LatAm and Middle East late 2026, everywhere else
+   July 2027. Only month-level dates were announced, so the timer is an upper bound.
 
 Nothing is purchased here. There is no login, no storage on a server, and no server.
 
