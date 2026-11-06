@@ -139,8 +139,7 @@ async function run(rawInput, region) {
     }
     const { card, note } = await resolveInput(value, region);
     state.card = card;
-    renderMessage(el.message, note || '', note ? 'info' : 'info');
-    if (!note) renderMessage(el.message, '', 'info');
+    renderMessage(el.message, '', 'info');
     renderCard(el.card, card, note, {
       copy: copyText,
       copyShare: () => copyText(shareUrl()),
