@@ -70,7 +70,14 @@ pub extern "C" fn normalize_input(p: *const u8, l: usize, dst: *mut u8, cap: usi
     let text = String::from_utf8_lossy(raw);
     let mut s = text.trim().to_uppercase();
     s = s.replace("PSNA_", "").replace(".EDAT", "");
-    out(s.trim(), dst, cap)
+    // Pasted hashes often carry invisible characters (zero-width spaces, BOMs,
+    // non-breaking spaces) that trim() does not remove. A hash or SKU is only
+    // ever ASCII alphanumerics, dashes and underscores, so drop everything else.
+    let cleaned: String = s
+        .chars()
+        .filter(|c| c.is_ascii_alphanumeric() || *c == '-' || *c == '_')
+        .collect();
+    out(cleaned.trim(), dst, cap)
 }
 
 /// `UP1004-BLUS30418_00-AVARDRSHADOWWOLF-U099` -> `...-U099` stripped.

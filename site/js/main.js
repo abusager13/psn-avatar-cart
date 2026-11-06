@@ -138,7 +138,8 @@ async function run(rawInput, region) {
   renderEmpty(el.card);
 
   try {
-    if (/^[0-9A-Fa-f]{40}$/.test(value.replace(/^PSNA_/i, '').replace(/\.edat$/i, ''))) {
+    if (!core.ready()) throw new Error('the core is still loading');
+    if (/^[0-9A-F]{40}$/.test(core.normalizeInput(value).value || '')) {
       await ensureIndex();
     }
     const { card, note } = await resolveInput(value, region);
@@ -212,9 +213,10 @@ function startAvailability(card, rawInput, region) {
 /* ---------------------------------------------------------------- URL */
 
 function shareUrl() {
-  const input = el.input.value.trim();
+  const input = core.normalizeInput(el.input.value).value || '';
+  if (!input) return location.href.split('?')[0];
   const params = new URLSearchParams();
-  const isHash = /^[0-9A-Fa-f]{40}$/.test(input.replace(/^PSNA_/i, '').replace(/\.edat$/i, ''));
+  const isHash = /^[0-9A-F]{40}$/.test(input);
   params.set(isHash ? 'hash' : 'sku', input);
   params.set('region', state.region);
   return `${location.origin}${location.pathname}?${params.toString()}`;
