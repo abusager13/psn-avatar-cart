@@ -7,6 +7,7 @@ const CHECKOUT = 'https://checkout.playstation.com/add';
 const CATALOG = 'https://store.playstation.com/store/api/chihiro/00_09_000/container';
 const REGIONS = ['US', 'GB', 'DE', 'FR', 'JP', 'PL', 'TR', 'AU', 'CA', 'IE', 'SE', 'ZA', 'IT', 'ES'];
 const INDEX_URL = 'data/avatar-sku-index.tsv';
+const SEARCH = 'https://commerce1.api.np.km.playstation.net/store/api/chihiro/00_09_000/search';
 
 const el = {
   chips: document.getElementById('chips'),
@@ -139,6 +140,64 @@ async function resolveItem(rawInput, region) {
     region,
     source,
   };
+}
+
+
+/* The archive stores the SKU that was inside each EDAT, which is the listing for
+   the region the file came from (mostly EU/JP). The same artwork is a different
+   product in other regions, so a US lookup of an EU SKU 404s even though the
+   avatar is sold there. This finds the regional twin by name. */
+
+function homeRegion(sku) {
+  const prefix = String(sku).slice(0, 2).toUpperCase();
+  if (prefix === 'EP') return 'GB';
+  if (prefix === 'JP') return 'JP';
+  if (prefix === 'HP') return 'HK';
+  return 'US';
+}
+
+function normName(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[\u00ae\u2122\u00a9]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+async function findTwin(base, targetRegion) {
+  const home = homeRegion(base);
+  if (home === targetRegion) return null;
+
+  let sourceName = null;
+  try {
+    const d = await fetchCatalog(base, home);
+    sourceName = d && d.name;
+  } catch {
+    return null;
+  }
+  if (!sourceName) return null;
+
+  const target = normName(sourceName);
+  if (!target) return null;
+
+  let data;
+  try {
+    const res = await fetch(`${SEARCH}/${targetRegion}/en/19/${encodeURIComponent(sourceName)}?platform=ps3`);
+    if (!res.ok) return null;
+    data = await res.json();
+  } catch {
+    return null;
+  }
+
+  for (const item of (data && data.links) || []) {
+    if (item.top_category !== 'avatar') continue;
+    const cand = normName(item.name);
+    if (!cand) continue;
+    if (cand.includes(target) || target.includes(cand)) {
+      return { sku: item.id, name: item.name, home, sourceName };
+    }
+  }
+  return null;
 }
 
 async function liveRegions(base, excluding) {
@@ -309,9 +368,27 @@ async function run(raw, region) {
     clearMessage();
   } catch (err) {
     if (err && err.kind === 'notSold') {
-      setMessage(`Not sold in ${err.region} — checking the other ${REGIONS.length - 1} stores…`, 'info');
-      const regions = await liveRegions(err.base, err.region);
-      setMessage(messageFor(err, regions), 'error');
+      setMessage(`Not sold as that SKU in ${err.region} — checking for the same avatar there…`, 'info');
+
+      const twin = await findTwin(err.base, err.region);
+      if (twin) {
+        try {
+          const card = await resolveItem(twin.sku, err.region);
+          card.source = `Same avatar as "${twin.sourceName}" (${twin.home} listing)`;
+          state.card = card;
+          clearMessage();
+          setMessage(
+            `That SKU is ${twin.home}-only. Showing the ${err.region} listing of the same avatar: ${card.name}.`,
+            'info'
+          );
+        } catch {
+          const regions = await liveRegions(err.base, err.region);
+          setMessage(messageFor(err, regions), 'error');
+        }
+      } else {
+        const regions = await liveRegions(err.base, err.region);
+        setMessage(messageFor(err, regions), 'error');
+      }
     } else if (err && err.kind === 'transport' && /index/i.test(err.message || '')) {
       setMessage(messageFor(err), 'error');
     } else {
@@ -389,6 +466,9 @@ if (snap) {
       renderChips();
       el.input.value = 'B19E79472B5D7F475C9FEAFC93FF7F2A6C4DEDAB';
       await run(el.input.value, 'GB');
+    } else if (snap === 'twin') {
+      el.input.value = '0313AC7E86C07FD76067E4D7276852B3819350F7';
+      await run(el.input.value, 'US');
     } else if (snap !== 'empty') {
       el.input.value = 'UP1004-BLUS30418_00-AVARDRSHADOWWOLF';
       await run(el.input.value, 'US');
