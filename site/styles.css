@@ -1,4 +1,12 @@
 @font-face {
+  font-family: 'Homoarakhn';
+  src: url('fonts/homoarakhn.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Orbitron';
   src: url('fonts/orbitron.woff2') format('woff2');
   font-weight: 400 900;
@@ -74,9 +82,9 @@ body {
      is used; otherwise the self-hosted OFL font takes over. Nothing proprietary
      is shipped with the site. */
   font-family: 'Homoarakhn', 'Ethnocentric', 'Orbitron', ui-sans-serif, system-ui, sans-serif;
-  font-size: 32px;
+  font-size: 33px;
   line-height: 1.2;
-  letter-spacing: 0.015em;
+  letter-spacing: 0.005em;
   font-weight: 800;
   text-transform: uppercase;
   transform: skewX(-7deg);

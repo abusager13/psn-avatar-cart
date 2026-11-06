@@ -88,6 +88,16 @@ content ID out of each EDAT header. It contains product identifiers and game nam
 artwork, no avatar images, no Sony assets. Artwork in the UI is fetched from Sony's CDN at runtime
 and never bundled or proxied.
 
+## Fonts
+
+- **Homoarakhn** (Dan Zadorozny / Iconian Fonts) — the title face. Iconian's terms allow free
+  **non-commercial** use; commercial use is $20/seat with written consent. This site is a free fan
+  tool with no ads or payments. If that changes, the font must be licensed or removed first.
+- **Orbitron** (SIL OFL 1.1) — fallback title face, shipped with its licence.
+
+Both are self-hosted; nothing is loaded from a third-party font CDN. Full terms in
+[`site/fonts/FONT-LICENSES.md`](site/fonts/FONT-LICENSES.md).
+
 ## Legal
 
 Unofficial fan tool. Not affiliated with, endorsed by, or sponsored by Sony Interactive
