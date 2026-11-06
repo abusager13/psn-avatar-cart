@@ -73,6 +73,7 @@ GET store.playstation.com/store/api/chihiro/00_09_000/container/{REGION}/en/19/{
 | Hash → SKU | [`site/data/avatar-sku-index.tsv`](site/data/avatar-sku-index.tsv), 5,415 rows |
 | Flat SKU list | [`site/data/avatar-skus.txt`](site/data/avatar-skus.txt), 5,346 unique |
 | Live catalogue | [`site/data/live-catalog.tsv`](site/data/live-catalog.tsv) — 4,500 rows across 14 stores, 1,743 distinct SKUs, **1,153 absent from the archive** |
+| Deep US catalogue | [`site/data/live-us.tsv`](site/data/live-us.tsv) — 2,442 US avatars, **2,071 absent from the archive** |
 
 The `clientId` is Sony's public first-party OAuth client identifier, visible in their own store page
 source. It is not a secret, and not ours.
