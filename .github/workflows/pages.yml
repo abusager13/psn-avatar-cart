@@ -23,11 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Add the SKU index to the site
-        run: |
-          mkdir -p site/data
-          cp desktop/resources/avatar-sku-index.tsv site/data/avatar-sku-index.tsv
-
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
