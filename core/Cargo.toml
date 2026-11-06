@@ -1,0 +1,16 @@
+[package]
+name = "psn-core"
+version = "0.1.0"
+edition = "2021"
+description = "Pure logic for PSN Avatar Cart: SKU rules, EDAT headers, index lookup"
+license = "UNLICENSED"
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

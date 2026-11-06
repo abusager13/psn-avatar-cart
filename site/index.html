@@ -3,51 +3,108 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>PSN Avatar Cart</title>
-    <meta name="description" content="Paste a PSNA hash or PlayStation SKU, get a live price and a working PlayStation Store cart link. No install, no login." />
+    <title>PSN Avatar Cart — PSNA hash or SKU to Store cart link</title>
+    <meta
+      name="description"
+      content="Paste a PSNA hash, a PlayStation SKU, or an .edat file to see the live price, which regions still sell it, and a working PlayStation Store cart link. No install, no login."
+    />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
   </head>
   <body>
     <main id="app">
-      <header>
+      <header class="hero">
         <h1>PSN Avatar <span class="arrow">→</span> Cart</h1>
-        <p class="sub">PSNA hash or SKU → live catalog lookup → checkout link</p>
+        <p class="tagline">
+          A PSNA hash, a SKU, or an <code>.edat</code> file in. A live price, the regions that still
+          sell it, and a working PlayStation Store cart link out.
+        </p>
+        <p class="hero-note">
+          No install. No login. Nothing is purchased here — you pay on PlayStation's own page.
+        </p>
       </header>
 
-      <div id="chips" class="chips" role="group" aria-label="Store region"></div>
+      <section class="tool" aria-label="Lookup">
+        <div id="chips" class="chips" role="group" aria-label="Store region"></div>
 
-      <div class="row">
-        <div class="field">
-          <input id="input" type="text" spellcheck="false" autocomplete="off" autocapitalize="characters"
-                 placeholder="Paste a PSNA hash or SKU…" aria-label="PSNA hash or SKU" />
+        <div class="row">
+          <label class="field">
+            <span class="sr-only">PSNA hash or SKU</span>
+            <input
+              id="input"
+              type="text"
+              spellcheck="false"
+              autocomplete="off"
+              autocapitalize="characters"
+              placeholder="PSNA hash or SKU…"
+            />
+          </label>
+          <button id="paste" class="btn ghost" type="button" title="Read from clipboard">Paste</button>
+          <button id="edat" class="btn ghost" type="button" title="Read a PSNA .edat file">Open .edat…</button>
+          <button id="go" class="btn primary" type="button">Resolve</button>
+          <input id="file" type="file" accept=".edat" hidden />
         </div>
-        <button id="paste" class="btn ghost" type="button">Paste</button>
-        <button id="edat" class="btn ghost" type="button">Open .edat…</button>
-        <button id="go" class="btn primary" type="button">Resolve</button>
-        <input id="file" type="file" accept=".edat" hidden />
-      </div>
 
-      <div id="message" class="message hidden" role="status" aria-live="polite"></div>
+        <div id="message" class="message hidden" role="status" aria-live="polite"></div>
 
-      <section id="card" class="card empty">
-        <div class="empty-inner">
-          <strong>No item resolved yet</strong>
-          <span>Pick a region, paste a PSNA hash or SKU, then hit Resolve.<br />
-          Artwork, price and a ready-to-use cart link appear here.</span>
+        <article id="card" class="card empty" aria-live="polite">
+          <div class="empty-inner">
+            <strong>Nothing resolved yet</strong>
+            <span>
+              Pick your store region, then paste a PSNA hash or SKU — or open a <code>.edat</code> file.
+              Try <button class="linky" id="example" type="button">an example</button>.
+            </span>
+          </div>
+        </article>
+
+        <div id="permalink" class="permalink hidden">
+          <span class="permalink-label">Shareable link</span>
+          <code id="permalink-url"></code>
+          <button id="permalink-copy" class="btn tiny ghost" type="button">Copy</button>
         </div>
       </section>
 
-      <footer>
+      <section id="regions" class="regions hidden" aria-label="Regional availability">
+        <div class="section-head">
+          <h2>Where it's still sold</h2>
+          <span id="regions-summary" class="section-note"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Region</th><th>Status</th><th>Price</th><th></th></tr>
+            </thead>
+            <tbody id="regions-body"></tbody>
+          </table>
+        </div>
+        <p class="table-note">
+          Prices are in each store's own currency, so they aren't directly comparable.
+          <span class="dot twin"></span> marks a match found by name — the same artwork sold under a
+          different product ID in that region.
+        </p>
+      </section>
+
+      <section id="recent-section" class="recent hidden" aria-label="Recent lookups">
+        <div class="section-head">
+          <h2>Recent</h2>
+          <button id="recent-clear" class="btn tiny ghost" type="button">Clear</button>
+        </div>
+        <div id="recent" class="recent-list"></div>
+      </section>
+
+      <footer class="foot">
         <p>
-          Nothing is purchased here — the link only puts the item in your cart; you confirm and pay on
-          PlayStation's own checkout page. No login, no account data, no tracking.
+          Uses Sony's public catalog API — the same one the store front-end calls. Artwork is loaded
+          from Sony's CDN at runtime and never stored here. The site keeps your recent lookups in this
+          browser only; nothing is sent to a server we control, because there isn't one.
         </p>
         <p class="tiny">
-          Works because Sony's catalog API allows cross-origin reads. Unofficial fan tool; not
-          affiliated with Sony Interactive Entertainment.
+          Unofficial fan tool. Not affiliated with, endorsed by, or sponsored by Sony Interactive
+          Entertainment. PlayStation and PSN are trademarks of Sony Interactive Entertainment LLC.
         </p>
       </footer>
     </main>
-    <script src="app.js"></script>
+
+    <script type="module" src="js/main.js"></script>
   </body>
 </html>
