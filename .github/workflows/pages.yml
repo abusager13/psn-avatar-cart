@@ -12,7 +12,10 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  # Queue rather than cancel: cancelling a run mid-deploy leaves the Pages
+  # deployment record dangling and every later deploy dies with
+  # "Deployment cancelled".
+  cancel-in-progress: false
 
 jobs:
   deploy:
