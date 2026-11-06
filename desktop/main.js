@@ -31,6 +31,23 @@ function loadIndex() {
   return index;
 }
 
+// Only allow artwork that Sony actually serves; the URL comes from an
+// external response, so it is validated before it reaches the renderer.
+function trustedImageUrl(value) {
+  if (typeof value !== 'string') return null;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'https:') return null;
+    const host = url.hostname.toLowerCase();
+    if (host.endsWith('.playstation.net') || host.endsWith('.playstation.com')) {
+      return url.toString();
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
 function stripVariant(sku) {
   const m = sku.match(/^(.*)-([A-Z][A-Z0-9]{3})$/);
   return m ? m[1] : sku;
@@ -90,8 +107,9 @@ async function resolve(rawInput, region) {
   const data = await fetchCatalog(base, region);
   const ds = data.default_sku || {};
   const checkoutSku = ds.id || base;
-  const images = data.images || [];
-  const image = images.length ? images[images.length - 1].url : null;
+  const images = Array.isArray(data.images) ? data.images : [];
+  const rawImage = images.length ? images[images.length - 1].url : null;
+  const image = trustedImageUrl(rawImage);
 
   return {
     name: data.name || '(unnamed)',
