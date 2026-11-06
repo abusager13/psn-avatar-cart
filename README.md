@@ -76,6 +76,7 @@ CI builds both platforms on every push to `main` — see `.github/workflows/buil
 | Cart link | `checkout.playstation.com/add/{SKU}?clientId=2eb25762-877f-4140-b341-7c7e14c19f98` |
 | Hash → SKU | `resources/avatar-sku-index.tsv` (5,415 rows) |
 | `.edat` → SKU | content ID at byte `0x10` of the file header |
+| Regional twin | the same avatar is a *different* SKU in each region; on a 404 the app resolves the SKU in its home store, then matches the name in the target store |
 
 The catalog endpoint is Sony's legacy Chihiro API. It still indexes PS3 content, including avatars
 that have no remaining storefront UI, and it returns the price and artwork the app displays. The

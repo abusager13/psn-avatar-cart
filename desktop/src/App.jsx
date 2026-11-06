@@ -41,7 +41,12 @@ export default function App() {
       const res = await window.api.resolve(raw, reg);
       if (res.ok) {
         setCard(res.card);
-        setMessage(null);
+        if (res.note) {
+          setMessage(res.note);
+          setMessageKind('info');
+        } else {
+          setMessage(null);
+        }
       } else {
         setCard(null);
         setMessage(res.message);
@@ -109,6 +114,9 @@ export default function App() {
         setRegion('GB');
         setValue('B19E79472B5D7F475C9FEAFC93FF7F2A6C4DEDAB');
         await run('B19E79472B5D7F475C9FEAFC93FF7F2A6C4DEDAB', 'GB');
+      } else if (snap === 'twin') {
+        setValue('0313AC7E86C07FD76067E4D7276852B3819350F7');
+        await run('0313AC7E86C07FD76067E4D7276852B3819350F7', 'US');
       } else if (snap !== 'empty') {
         setValue('UP1004-BLUS30418_00-AVARDRSHADOWWOLF');
         await run('UP1004-BLUS30418_00-AVARDRSHADOWWOLF', 'US');

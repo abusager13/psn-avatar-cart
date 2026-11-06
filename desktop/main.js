@@ -6,6 +6,7 @@ const fs = require('node:fs');
 const CLIENT_ID = '2eb25762-877f-4140-b341-7c7e14c19f98';
 const CHECKOUT = 'https://checkout.playstation.com/add';
 const CATALOG = 'https://store.playstation.com/store/api/chihiro/00_09_000/container';
+const SEARCH = 'https://commerce1.api.np.km.playstation.net/store/api/chihiro/00_09_000/search';
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36';
 
 const REGIONS = ['US', 'GB', 'DE', 'FR', 'JP', 'PL', 'TR', 'AU', 'CA', 'IE', 'SE', 'ZA', 'IT', 'ES'];
@@ -125,6 +126,61 @@ async function resolve(rawInput, region) {
   };
 }
 
+// The archive stores the SKU found inside each EDAT, i.e. the listing for the
+// region that file came from. The same artwork is a different product elsewhere,
+// so a US lookup of an EU SKU 404s even though the avatar is sold there.
+function homeRegion(sku) {
+  const prefix = String(sku).slice(0, 2).toUpperCase();
+  if (prefix === 'EP') return 'GB';
+  if (prefix === 'JP') return 'JP';
+  if (prefix === 'HP') return 'HK';
+  return 'US';
+}
+
+function normName(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[\u00ae\u2122\u00a9]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+async function findTwin(base, targetRegion) {
+  const home = homeRegion(base);
+  if (home === targetRegion) return null;
+
+  let sourceName = null;
+  try {
+    const d = await fetchCatalog(base, home);
+    sourceName = d && d.name;
+  } catch {
+    return null;
+  }
+  if (!sourceName) return null;
+
+  const target = normName(sourceName);
+  if (!target) return null;
+
+  let data;
+  try {
+    const res = await fetch(`${SEARCH}/${targetRegion}/en/19/${encodeURIComponent(sourceName)}?platform=ps3`);
+    if (!res.ok) return null;
+    data = await res.json();
+  } catch {
+    return null;
+  }
+
+  for (const item of (data && data.links) || []) {
+    if (item.top_category !== 'avatar') continue;
+    const cand = normName(item.name);
+    if (!cand) continue;
+    if (cand.includes(target) || target.includes(cand)) {
+      return { sku: item.id, name: item.name, home, sourceName };
+    }
+  }
+  return null;
+}
+
 async function liveRegions(base, excluding) {
   const targets = REGIONS.filter((r) => r !== excluding);
   const results = await Promise.all(
@@ -208,6 +264,20 @@ ipcMain.handle('resolve', async (_e, { input, region }) => {
     return { ok: true, card };
   } catch (err) {
     if (err instanceof LookupError && err.kind === 'notSold') {
+      const twin = await findTwin(err.payload.base, err.payload.region);
+      if (twin) {
+        try {
+          const card = await resolve(twin.sku, err.payload.region);
+          card.source = `Same avatar as "${twin.sourceName}" (${twin.home} listing)`;
+          return {
+            ok: true,
+            card,
+            note: `That SKU is ${twin.home}-only. Showing the ${err.payload.region} listing of the same avatar: ${card.name}.`,
+          };
+        } catch {
+          /* fall through to the region hunt */
+        }
+      }
       const regions = await liveRegions(err.payload.base, err.payload.region);
       return { ok: false, message: messageFor(err, regions) };
     }
