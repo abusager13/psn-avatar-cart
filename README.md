@@ -90,6 +90,19 @@ content ID out of each EDAT header. It contains product identifiers and game nam
 artwork, no avatar images, no Sony assets. Artwork in the UI is fetched from Sony's CDN at runtime
 and never bundled or proxied.
 
+## Bulk scanning a console dump
+
+`tools/edat-scan.mjs` walks a folder of PSNA `.edat` files, reads the content ID out of each header,
+and writes a TSV you can merge into the index. Works on any `.edat`, not just archived ones.
+
+```bash
+node tools/edat-scan.mjs ./psn_avatar --region US --out scan.tsv
+```
+
+On a console, every avatar you own lives in `/dev_hdd0/home/<userid>/psn_avatar/` as
+`PSNA_<hash>.edat` — copy that folder off (FTP/homebrew) and scan it. Output columns:
+`hash · content_id · name · price · region · status`, where status is `live`, `delisted` or `unknown`.
+
 ## Fonts
 
 - **Homoarakhn** (Dan Zadorozny / Iconian Fonts) — the title face. Iconian's terms allow free
