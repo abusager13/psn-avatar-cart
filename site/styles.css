@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Orbitron';
+  src: url('fonts/orbitron.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg: #0b0d11;
   --bg-soft: #10131a;
@@ -62,10 +70,18 @@ body {
 
 .hero h1 {
   margin: 0;
-  font-size: 34px;
-  line-height: 1.15;
-  letter-spacing: -0.9px;
-  font-weight: 700;
+  /* If the visitor happens to have a Spider-Man-style face installed locally it
+     is used; otherwise the self-hosted OFL font takes over. Nothing proprietary
+     is shipped with the site. */
+  font-family: 'Homoarakhn', 'Ethnocentric', 'Orbitron', ui-sans-serif, system-ui, sans-serif;
+  font-size: 32px;
+  line-height: 1.2;
+  letter-spacing: 0.015em;
+  font-weight: 800;
+  text-transform: uppercase;
+  transform: skewX(-7deg);
+  transform-origin: left center;
+  padding-right: 10px;
 }
 .hero h1 .arrow { color: var(--faint); font-weight: 400; }
 
