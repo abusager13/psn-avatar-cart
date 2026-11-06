@@ -46,8 +46,27 @@ async function loadCatalog() {
 const imageQueue = [];
 let active = 0;
 
+const observer = 'IntersectionObserver' in window
+  ? new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        observer.unobserve(entry.target);
+        const job = entry.target.__job;
+        if (job) { imageQueue.push(job); pump(); }
+      }
+    }, { rootMargin: '200px' })
+  : null;
+
 function requestImage(card, sku, region) {
-  imageQueue.push({ card, sku, region });
+  const job = { card, sku, region };
+  const thumb = card.querySelector('.av-thumb');
+  if (thumb) thumb.classList.add('loading');
+  if (observer && thumb) {
+    thumb.__job = job;
+    observer.observe(thumb);
+    return;
+  }
+  imageQueue.push(job);
   pump();
 }
 
@@ -80,9 +99,14 @@ async function fetchImage({ card, sku, region }) {
     image.referrerPolicy = 'no-referrer';
     image.alt = '';
     image.onload = () => card.querySelector('.av-thumb')?.replaceWith(image);
+
+    const priceEl = card.querySelector('.av-price');
+    const shown = (priceEl?.textContent || '').trim();
+    const real = (data.default_sku || {}).display_price;
+    if (priceEl && real && (!shown || shown === '—')) priceEl.textContent = real;
     image.src = img.url;
   } catch {
-    /* artwork is a nicety */
+    card.querySelector('.av-thumb')?.classList.remove('loading');
   }
 }
 
