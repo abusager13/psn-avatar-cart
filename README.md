@@ -71,8 +71,9 @@ GET store.playstation.com/store/api/chihiro/00_09_000/container/{REGION}/en/19/{
 | Name search | `commerce1.api.np.km.playstation.net/store/api/chihiro/…/search/…` |
 | Cart link | `checkout.playstation.com/add/{SKU}?clientId=…` |
 | Hash → SKU | [`site/data/avatar-sku-index.tsv`](site/data/avatar-sku-index.tsv), 5,415 rows |
-| Flat SKU list | [`site/data/avatar-skus.txt`](site/data/avatar-skus.txt), 5,346 unique |
-| Live catalogue | [`site/data/live-catalog.tsv`](site/data/live-catalog.tsv) — 4,500 rows across 14 stores, 1,743 distinct SKUs, **1,153 absent from the archive** |
+| Archive SKUs | [`site/data/avatar-skus.txt`](site/data/avatar-skus.txt), 5,346 unique |
+| **All known SKUs** | [`site/data/all-skus.txt`](site/data/all-skus.txt) — **8,417 unique**, the merged master list |
+| Live catalogue | [`site/data/live-catalog.tsv`](site/data/live-catalog.tsv) — 6,622 rows across 14 stores, 3,915 distinct SKUs, **3,070 absent from the archive** |
 | Deep US catalogue | [`site/data/live-us.tsv`](site/data/live-us.tsv) — 2,442 US avatars, **2,071 absent from the archive** |
 
 The `clientId` is Sony's public first-party OAuth client identifier, visible in their own store page
