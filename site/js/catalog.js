@@ -59,9 +59,20 @@ export async function loadIndex(url) {
   const response = await fetch(url, { cache: 'force-cache' });
   if (!response.ok) throw new LookupError('index', { message: `HTTP ${response.status}` });
   const text = await response.text();
-  const count = core.buildIndex(text);
-  if (count <= 0) throw new LookupError('index', { message: 'the index parsed to zero rows' });
-  return count;
+
+  // Count from the file itself; nothing here is a constant.
+  const hashes = new Set();
+  const skus = new Set();
+  for (const line of text.split('\n').slice(1)) {
+    const [hash, , sku] = line.split('\t');
+    if (!hash || !sku || !sku.trim()) continue;
+    hashes.add(hash.trim().toUpperCase());
+    skus.add(sku.trim());
+  }
+
+  const built = core.buildIndex(text);
+  if (built <= 0) throw new LookupError('index', { message: 'the index parsed to zero rows' });
+  return { hashes: hashes.size, skus: skus.size, built };
 }
 
 async function fetchCatalog(base, region) {
