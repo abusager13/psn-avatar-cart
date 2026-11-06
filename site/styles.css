@@ -470,6 +470,15 @@ td.a { text-align: right; }
   overflow: hidden;
 }
 .av-thumb { aspect-ratio: 1 / 1; background: var(--panel-hi); }
+.av-thumb.loading {
+  background-image: linear-gradient(100deg, var(--panel-hi) 30%, #232936 50%, var(--panel-hi) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+@keyframes shimmer {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
+}
 .av-img {
   display: block;
   width: 100%;
