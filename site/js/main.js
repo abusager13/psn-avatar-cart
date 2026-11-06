@@ -83,6 +83,18 @@ function paintRecent() {
 
 /* ---------------------------------------------------------------- helpers */
 
+/** Size of the full catalogue, counted from all-skus.txt on first use. */
+let cataloguePromise = null;
+function loadCatalogueSize() {
+  if (!cataloguePromise) {
+    cataloguePromise = fetch('data/all-skus.txt?v=__V__')
+      .then((r) => (r.ok ? r.text() : ''))
+      .then((text) => text.split('\n').filter((l) => l.trim()).length)
+      .catch(() => 0);
+  }
+  return cataloguePromise;
+}
+
 /** Names for avatars that are no longer sold anywhere (scene/archive lists). */
 let namesPromise = null;
 function loadNames() {
@@ -106,7 +118,12 @@ async function ensureIndex() {
   if (state.indexReady) return;
   if (!state.indexPromise) {
     state.indexPromise = loadIndex(INDEX_URL)
-      .then((count) => { state.indexReady = true; state.indexCount = count; })
+      .then(async (info) => {
+        state.indexReady = true;
+        state.indexCount = info.hashes;
+        state.indexSkus = info.skus;
+        state.catalogueSize = await loadCatalogueSize();
+      })
       .catch((error) => { state.indexPromise = null; throw error; });
   }
   return state.indexPromise;
@@ -117,10 +134,15 @@ function messageFor(error, scanned) {
     case 'badInput':
       return 'Paste a 40-character PSNA hash, a full SKU like UP1004-BLUS30418_00-AVARDRSHADOWWOLF, or open an .edat file.';
     case 'notInArchive': {
-      const size = state.indexCount ? `${state.indexCount.toLocaleString()} entries` : 'the hash index';
-      return `${error.payload.hash} isn't in the hash index (${size}).\n`
+      const parts = [];
+      if (state.indexCount) {
+        parts.push(`${state.indexCount.toLocaleString()} hashes → ${state.indexSkus.toLocaleString()} SKUs`);
+      }
+      const idx = parts.length ? ` (${parts[0]})` : '';
+      const total = state.catalogueSize ? ` The catalogue has ${state.catalogueSize.toLocaleString()} SKUs.` : '';
+      return `${error.payload.hash} isn't in the hash index${idx}.\n`
         + 'That index is the only hash → SKU map that exists, and it was built from dumped .edat files — '
-        + 'a hash outside it cannot be resolved without its file.\n'
+        + `a hash outside it cannot be resolved without its file.${total}\n`
         + 'Use “Open .edat…”, or search the catalogue by name or SKU.';
     }
     case 'index':
