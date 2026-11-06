@@ -6,7 +6,7 @@ import {
 } from './catalog.js';
 import {
   renderChips, renderMessage, renderEmpty, renderCard, renderRegionRows,
-  renderRecent, setRecentVisible,
+  renderRecent, setRecentVisible, renderCountdown,
 } from './ui.js';
 
 const INDEX_URL = 'data/avatar-sku-index.tsv';
@@ -28,6 +28,7 @@ const el = {
   regions: document.getElementById('regions'),
   regionsBody: document.getElementById('regions-body'),
   regionsSummary: document.getElementById('regions-summary'),
+  countdown: document.getElementById('countdown'),
   recentSection: document.getElementById('recent-section'),
   recent: document.getElementById('recent'),
 };
@@ -252,6 +253,7 @@ function pickRegion(code) {
   if (code === state.region) return;
   state.region = code;
   renderChips(el.chips, REGIONS, code, pickRegion);
+  renderCountdown(el.countdown, code);
   const value = el.input.value.trim();
   if (value) {
     run(value, code);
@@ -319,6 +321,11 @@ if (example) {
 
 async function boot() {
   renderChips(el.chips, REGIONS, state.region, pickRegion);
+  renderCountdown(el.countdown, state.region);
+  setInterval(() => {
+    renderCountdown(el.countdown, state.region);
+    if (state.rows.length) renderRegionRows(el.regionsBody, state.rows, REGION_NAMES);
+  }, 1000);
   renderEmpty(el.card);
   paintRecent();
 

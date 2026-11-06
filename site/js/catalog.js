@@ -25,6 +25,26 @@ export const REGIONS = [
 
 const REGION_SET = new Set(REGIONS.map((r) => r.code));
 
+/* Sony's published shutdown schedule (PlayStation.Blog, 1 Jul 2026).
+   Only month-level granularity was announced, so these are upper bounds:
+   the store may close earlier in the month than the target shown. */
+export const CLOSURE = {
+  default: {
+    target: '2027-07-01T00:00:00Z',
+    label: 'July 2027',
+    exact: false,
+    note: 'Sony announced “July 2027” without a day.',
+  },
+  TR: {
+    target: '2026-12-31T00:00:00Z',
+    label: 'late 2026',
+    exact: false,
+    note: "Sony groups Türkiye with the Middle East, which closes late 2026. Unconfirmed.",
+  },
+};
+
+export const closureFor = (code) => CLOSURE[code] || CLOSURE.default;
+
 export class LookupError extends Error {
   constructor(kind, payload = {}) {
     super(kind);

@@ -1,5 +1,9 @@
 // Rendering only. Everything here takes data and returns DOM; no network.
 
+import { closureFor } from './catalog.js';
+
+const DAY = 86400000;
+
 const esc = (value) =>
   String(value ?? '').replace(/[&<>"']/g, (c) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
@@ -79,7 +83,31 @@ export function renderCard(card, data, note, handlers) {
   });
 }
 
-export function renderRegionRows(tbody, rows, regionNames) {
+/** Live countdown for the selected store. */
+export function renderCountdown(node, code, now = Date.now()) {
+  if (!node) return;
+  const info = closureFor(code);
+  const left = Date.parse(info.target) - now;
+  const text = node.querySelector('.cd-text');
+  const clock = node.querySelector('.cd-clock');
+  const note = node.querySelector('.cd-note');
+
+  text.textContent = `PS3 store ${left > 0 ? 'closes' : 'closed'} ${info.label} · ${code}`;
+  node.classList.toggle('closed', left <= 0);
+
+  if (left <= 0) {
+    clock.textContent = 'closed';
+  } else {
+    const days = Math.floor(left / DAY);
+    const h = Math.floor((left % DAY) / 3600000);
+    const m = Math.floor((left % 3600000) / 60000);
+    const sec = Math.floor((left % 60000) / 1000);
+    clock.textContent = `${days}d ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(sec).padStart(2, '0')}s`;
+  }
+  note.textContent = info.note;
+}
+
+export function renderRegionRows(tbody, rows, regionNames, now = Date.now()) {
   tbody.innerHTML = '';
   for (const row of rows) {
     const tr = document.createElement('tr');
@@ -95,8 +123,13 @@ export function renderRegionRows(tbody, rows, regionNames) {
       ? `<a class="mini" href="${esc(row.link)}" target="_blank" rel="noopener noreferrer">open ↗</a>`
       : '';
 
+    const info = closureFor(row.region);
+    const daysLeft = Math.floor((Date.parse(info.target) - now) / DAY);
+    const closes = daysLeft > 0 ? `${info.label} · ${daysLeft}d` : 'closed';
+
     tr.className = `row-${row.status}`;
-    tr.innerHTML = `<td class="r">${esc(label)} <span class="code">${esc(row.region)}</span></td>
+    tr.innerHTML = `<td class="r">${esc(label)} <span class="code">${esc(row.region)}</span>
+        <span class="closes" title="${esc(info.note)}">closes ${esc(closes)}</span></td>
       <td>${status}</td>
       <td class="p">${price}</td>
       <td class="a">${action}</td>`;

@@ -212,6 +212,42 @@ code {
 .message.error { background: rgba(229, 84, 90, 0.09); border-color: rgba(229, 84, 90, 0.4); color: #ff9ea2; }
 .hidden { display: none !important; }
 
+/* ---------------------------------------------------------------- countdown */
+
+.countdown {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 9px 13px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(224, 163, 62, 0.32);
+  background: rgba(224, 163, 62, 0.07);
+  font-size: 12px;
+}
+.countdown .cd-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--warn);
+  flex: none;
+}
+.countdown .cd-text { color: var(--warn); }
+.countdown .cd-clock {
+  font: 600 12.5px ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.countdown .cd-note { color: var(--faint); font-size: 11px; }
+.countdown.closed { border-color: rgba(229, 84, 90, 0.35); background: rgba(229, 84, 90, 0.07); }
+.countdown.closed .cd-dot { background: var(--bad); }
+.countdown.closed .cd-text { color: var(--bad); }
+
+td.r .closes {
+  display: block;
+  font-size: 10px;
+  color: var(--faint);
+  margin-top: 1px;
+}
+
 /* ---------------------------------------------------------------- card */
 
 .card {
