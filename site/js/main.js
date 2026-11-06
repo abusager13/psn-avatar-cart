@@ -129,6 +129,9 @@ async function run(rawInput, region) {
   state.card = null;
   state.rows = [];
   el.go.disabled = true;
+  // Keep the URL and the share bar honest for this attempt, not the last one.
+  syncUrl();
+  el.permalink.classList.add('hidden');
   el.regions.classList.add('hidden');
   renderMessage(el.message, 'Querying the PlayStation catalog…', 'info');
   renderEmpty(el.card);
