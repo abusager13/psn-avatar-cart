@@ -3,7 +3,7 @@
 Desktop app that turns a **PSNA hash**, a **PSN SKU**, or a **`.edat` file** into a working
 PlayStation Store cart link — for PS3-era avatars that the web store no longer lets you browse.
 
-Private repo · macOS + Windows · React Native (react-native-web) UI in an Electron shell
+Public repo · macOS + Windows · React Native (react-native-web) UI in an Electron shell
 
 ![Result view](docs/result-us.png)
 
@@ -91,7 +91,8 @@ Unofficial fan tool. Not affiliated with, endorsed by, or sponsored by Sony Inte
 Entertainment. PlayStation and PSN are trademarks of Sony Interactive Entertainment LLC. Use it for
 your own account, at your own risk, and within the PlayStation Network terms you agreed to.
 
-Private repository — all rights reserved.
+Source available — all rights reserved. No open-source license is granted; the bundled
+index is derived from a third-party archive and is not the author's to license.
 
 ## Invite collaborators
 
