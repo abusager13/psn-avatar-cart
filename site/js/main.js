@@ -106,7 +106,7 @@ async function ensureIndex() {
   if (state.indexReady) return;
   if (!state.indexPromise) {
     state.indexPromise = loadIndex(INDEX_URL)
-      .then(() => { state.indexReady = true; })
+      .then((count) => { state.indexReady = true; state.indexCount = count; })
       .catch((error) => { state.indexPromise = null; throw error; });
   }
   return state.indexPromise;
@@ -116,8 +116,13 @@ function messageFor(error, scanned) {
   switch (error.kind) {
     case 'badInput':
       return 'Paste a 40-character PSNA hash, a full SKU like UP1004-BLUS30418_00-AVARDRSHADOWWOLF, or open an .edat file.';
-    case 'notInArchive':
-      return `${error.payload.hash} isn't in the archive index.\nIt covers the 5,415 avatars from the PS3-Avatars-Edat collection — use “Open .edat…” for anything else.`;
+    case 'notInArchive': {
+      const size = state.indexCount ? `${state.indexCount.toLocaleString()} entries` : 'the hash index';
+      return `${error.payload.hash} isn't in the hash index (${size}).\n`
+        + 'That index is the only hash → SKU map that exists, and it was built from dumped .edat files — '
+        + 'a hash outside it cannot be resolved without its file.\n'
+        + 'Use “Open .edat…”, or search the catalogue by name or SKU.';
+    }
     case 'index':
       return `Could not load the avatar index (${error.payload.message}).`;
     case 'notSoldAnywhere': {
