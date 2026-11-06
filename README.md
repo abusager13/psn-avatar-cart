@@ -93,11 +93,3 @@ your own account, at your own risk, and within the PlayStation Network terms you
 
 Source available — all rights reserved. No open-source license is granted; the bundled
 index is derived from a third-party archive and is not the author's to license.
-
-## Invite collaborators
-
-```bash
-gh api -X PUT repos/abusager13/psn-avatar-cart/collaborators/<username> -f permission=push
-```
-
-Or in the browser: **Settings → Collaborators → Add people**.
