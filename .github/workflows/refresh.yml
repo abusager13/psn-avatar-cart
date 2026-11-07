@@ -1,0 +1,42 @@
+name: Refresh catalogue
+
+on:
+  schedule:
+    # Sundays 03:17 UTC — delistings are the thing worth catching weekly.
+    - cron: '17 3 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check every SKU against the store
+        run: node tools/refresh.mjs
+        env:
+          CONCURRENCY: 8
+
+      - name: Commit the health report
+        run: |
+          if git diff --quiet site/data/catalog-health.tsv; then
+            echo "no change"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data/catalog-health.tsv
+          git commit -m "Weekly catalogue health: $(grep -c $'\tgone\t' site/data/catalog-health.tsv || true) delisted"
+          git push

@@ -72,9 +72,10 @@ GET store.playstation.com/store/api/chihiro/00_09_000/container/{REGION}/en/19/{
 | Cart link | `checkout.playstation.com/add/{SKU}?clientId=…` |
 | Hash → SKU | [`site/data/avatar-sku-index.tsv`](site/data/avatar-sku-index.tsv) — 5,415 rows, **5,349 resolvable hashes** (some repeat across game folders) |
 | Archive SKUs | [`site/data/avatar-skus.txt`](site/data/avatar-skus.txt), 5,346 unique |
-| **All known SKUs** | [`site/data/all-skus.txt`](site/data/all-skus.txt) — **27,051 unique**, the merged master list |
-| Live catalogue | [`site/data/live-catalog.tsv`](site/data/live-catalog.tsv) — 99,662 rows across 14 stores, 24,267 distinct SKUs, **21,704 absent from the archive** |
+| **All known SKUs** | [`site/data/all-skus.txt`](site/data/all-skus.txt) — **28,733 unique**, the merged master list |
+| Live catalogue | [`site/data/live-catalog.tsv`](site/data/live-catalog.tsv) — 101,831 rows across 14 stores, 26,435 distinct SKUs, **23,386 absent from the archive** |
 | Deep US catalogue | [`site/data/live-us.tsv`](site/data/live-us.tsv) — 11,090 US avatars, **9,642 absent from the archive** |
+| Health report | [`site/data/catalog-health.tsv`](site/data/catalog-health.tsv) — per-SKU live/delisted status, refreshed weekly by [`refresh.yml`](.github/workflows/refresh.yml) |
 | Avatar names | [`site/data/avatar-names.tsv`](site/data/avatar-names.tsv) — 1,365 names for delisted/archived SKUs, 934 of which the archive had no name for |
 
 The `clientId` is Sony's public first-party OAuth client identifier, visible in their own store page
