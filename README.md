@@ -72,8 +72,8 @@ GET store.playstation.com/store/api/chihiro/00_09_000/container/{REGION}/en/19/{
 | Cart link | `checkout.playstation.com/add/{SKU}?clientId=…` |
 | Hash → SKU | [`site/data/avatar-sku-index.tsv`](site/data/avatar-sku-index.tsv) — 5,350 resolvable hashes. Mostly read from `.edat` files, plus any mapping confirmed by hand |
 | Archive SKUs | [`site/data/avatar-skus.txt`](site/data/avatar-skus.txt), 5,346 unique |
-| **All known SKUs** | [`site/data/all-skus.txt`](site/data/all-skus.txt) — **28,733 unique**, the merged master list |
-| Live catalogue | [`site/data/live-catalog.tsv`](site/data/live-catalog.tsv) — 101,831 rows across 14 stores, 26,435 distinct SKUs, **23,386 absent from the archive** |
+| **All known SKUs** | [`site/data/all-skus.txt`](site/data/all-skus.txt) — **30,234 unique**, the merged master list |
+| Live catalogue | [`site/data/live-catalog.tsv`](site/data/live-catalog.tsv) — 103,737 rows across 14 stores, 28,341 distinct SKUs, **24,888 absent from the archive** |
 | Deep US catalogue | [`site/data/live-us.tsv`](site/data/live-us.tsv) — 11,090 US avatars, **9,642 absent from the archive** |
 | Archive view | [`site/data/archive.tsv`](site/data/archive.tsv) — 5,375 resolved hashes with game, avatar name where known, and live/delisted status |
 | Avatar names | [`site/data/avatar-names.tsv`](site/data/avatar-names.tsv) — 1,365 names for delisted/archived SKUs, 934 of which the archive had no name for |
