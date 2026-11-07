@@ -3,6 +3,7 @@
 import { initCore, core, ERR } from './wasm.js';
 import {
   REGIONS, LookupError, isRegion, loadIndex, resolveInput, availability, cardFromRegion,
+  fetchItem as catalogFetchItem,
 } from './catalog.js';
 import {
   renderChips, renderMessage, renderEmpty, renderCard, renderRegionRows,
@@ -253,11 +254,11 @@ async function run(rawInput, region) {
 }
 
 async function fetchItem(base, region) {
-  const response = await fetch(
-    `https://store.playstation.com/store/api/chihiro/00_09_000/container/${region}/en/19/${base}/`
-  );
-  if (!response.ok) return null;
-  return response.json();
+  try {
+    return await catalogFetchItem(base, region);
+  } catch {
+    return null;
+  }
 }
 
 function startAvailability(card, rawInput, region) {
