@@ -75,7 +75,7 @@ GET store.playstation.com/store/api/chihiro/00_09_000/container/{REGION}/en/19/{
 | **All known SKUs** | [`site/data/all-skus.txt`](site/data/all-skus.txt) — **30,234 unique**, the merged master list |
 | Live catalogue | [`site/data/live-catalog.tsv`](site/data/live-catalog.tsv) — 103,737 rows across 14 stores, 28,341 distinct SKUs, **24,888 absent from the archive** |
 | Deep US catalogue | [`site/data/live-us.tsv`](site/data/live-us.tsv) — 11,090 US avatars, **9,642 absent from the archive** |
-| Archive view | [`site/data/archive.tsv`](site/data/archive.tsv) — 5,375 resolved hashes with game, avatar name where known, and live/delisted status |
+| Delisted list | [`site/data/archive.tsv`](site/data/archive.tsv) — 1,913 hashes that resolve to a product ID but are sold in none of the 14 stores |
 | Avatar names | [`site/data/avatar-names.tsv`](site/data/avatar-names.tsv) — 1,365 names for delisted/archived SKUs, 934 of which the archive had no name for |
 
 The `clientId` is Sony's public first-party OAuth client identifier, visible in their own store page

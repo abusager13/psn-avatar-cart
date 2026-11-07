@@ -14,10 +14,8 @@ const el = {
 };
 
 const FILTERS = [
-  { id: 'all', label: 'All', test: () => true },
-  { id: 'gone', label: 'Delisted only', test: (r) => r.live === 'no' },
-  { id: 'live', label: 'Still sold', test: (r) => r.live === 'yes' },
-  { id: 'named', label: 'Named', test: (r) => Boolean(r.name) },
+  { id: 'all', label: 'All delisted', test: () => true },
+  { id: 'named', label: 'With a name', test: (r) => Boolean(r.name) },
 ];
 
 const state = { rows: [], query: '', filter: 'all', shown: 0, matched: [] };
@@ -28,9 +26,9 @@ async function load() {
   const text = await res.text();
   const rows = [];
   for (const line of text.split('\n').slice(1)) {
-    const [hash, sku, game, name, live] = line.split('\t');
+    const [hash, sku, game, name] = line.split('\t');
     if (!hash || !sku) continue;
-    rows.push({ hash, sku, game: game || '', name: name || '', live: live || 'no' });
+    rows.push({ hash, sku, game: game || '', name: name || '' });
   }
   return rows;
 }
@@ -56,18 +54,15 @@ function apply() {
 
 function renderCount() {
   const total = state.rows.length;
-  const gone = state.rows.filter((r) => r.live === 'no').length;
   el.count.textContent = state.query || state.filter !== 'all'
-    ? `${state.matched.length.toLocaleString()} of ${total.toLocaleString()} hashes`
-    : `${total.toLocaleString()} hashes · ${gone.toLocaleString()} delisted`;
+    ? `${state.matched.length.toLocaleString()} of ${total.toLocaleString()} delisted avatars`
+    : `${total.toLocaleString()} delisted avatars`;
 }
 
 function card(row) {
   const article = document.createElement('article');
   article.className = 'av';
-  const badge = row.live === 'yes'
-    ? '<span class="badge live">still sold</span>'
-    : '<span class="badge gone">delisted</span>';
+  const badge = '<span class="badge gone">delisted</span>';
   article.innerHTML = `
     <div class="av-body">
       <p class="av-meta"><span class="av-region">${esc(row.game || 'unknown game')}</span>${badge}</p>
@@ -148,8 +143,7 @@ async function boot() {
     el.lede.textContent = `Could not load the archive (${error.message}).`;
     return;
   }
-  const gone = state.rows.filter((r) => r.live === 'no').length;
-  el.lede.textContent = `${state.rows.length.toLocaleString()} hashes resolve to a product ID — ${gone.toLocaleString()} of them are no longer sold anywhere.`;
+  el.lede.textContent = `${state.rows.length.toLocaleString()} avatars we can name by hash that no longer exist in any of the 14 stores.`;
   const params = new URLSearchParams(location.search);
   if (params.get('filter')) state.filter = params.get('filter');
   if (params.get('q')) { el.q.value = params.get('q'); state.query = params.get('q'); }
