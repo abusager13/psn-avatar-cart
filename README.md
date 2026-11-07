@@ -5,7 +5,7 @@ PlayStation Store cart link — and shows you which store regions still sell it.
 
 ### → **https://abusager13.github.io/psn-avatar-cart/**
 
-Static site. No install, no backend, no account of its own.
+Static site. No install, no login, no backend.
 
 ![Result and regional availability](docs/result-us.png)
 
