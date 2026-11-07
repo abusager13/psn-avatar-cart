@@ -490,3 +490,17 @@ td.a { text-align: right; }
 .browse-link { margin: 2px 0 0; font-size: 12px; }
 .browse-link a { color: var(--accent); text-decoration: none; }
 .browse-link a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+}
+.badge.gone { color: #e08a8a; border-color: #4a2d2d; background: #241a1a; }
+.badge.live { color: #7fc08a; border-color: #2d4a33; background: #1a241c; }
+.av-sku.hash { opacity: .55; font-size: 9px; }
+.av-meta { align-items: center; }
