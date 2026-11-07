@@ -1,4 +1,4 @@
-# PSN Avatar Cart
+# PS3 Avatars
 
 A web tool that turns a **PSNA hash**, a **PSN SKU**, or a **`.edat` file** into a working
 PlayStation Store cart link — and shows you which store regions still sell it.
