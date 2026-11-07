@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Archive — PSN Avatar Cart</title>
+    <meta name="description" content="Every PSNA hash we can resolve to a SKU, including the ones no longer for sale." />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  </head>
+  <body>
+    <main id="app" class="wide">
+      <header class="hero">
+        <p class="crumb"><a href="./">← PSN Avatar Cart</a> · <a href="catalog.html">Catalogue</a></p>
+        <h1>Archive</h1>
+        <p class="tagline" id="lede">Loading the archive…</p>
+      </header>
+
+      <section class="tool">
+        <div class="row">
+          <label class="field">
+            <span class="sr-only">Search by hash, game, name or SKU</span>
+            <input id="q" type="search" placeholder="Search by hash, game, avatar name or SKU…" autocomplete="off" spellcheck="false" />
+          </label>
+          <button id="clear" class="btn ghost" type="button">Clear</button>
+        </div>
+        <div id="filters" class="chips" role="group" aria-label="Filter"></div>
+        <p id="count" class="count"></p>
+      </section>
+
+      <section id="results" class="grid" aria-live="polite"></section>
+
+      <div class="more-wrap">
+        <button id="more" class="btn ghost hidden" type="button">Load more</button>
+      </div>
+
+      <footer class="foot">
+        <p>
+          Each row is a PSNA hash we can resolve to a product ID, read out of a dumped
+          <code>.edat</code>. “Open” runs the live check against all 14 stores and tells you whether
+          it's still sold — the archive says what existed, the store says what exists.
+        </p>
+        <p class="tiny">
+          Unofficial fan tool. Not affiliated with, endorsed by, or sponsored by Sony Interactive
+          Entertainment. Prices shown are per-region and not directly comparable.
+        </p>
+      </footer>
+    </main>
+    <script type="module" src="js/archive.js?v=__V__"></script>
+  </body>
+</html>
