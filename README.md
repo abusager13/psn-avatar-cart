@@ -70,7 +70,7 @@ GET store.playstation.com/store/api/chihiro/00_09_000/container/{REGION}/en/19/{
 | Catalog lookup | `store.playstation.com/store/api/chihiro/…` |
 | Name search | `commerce1.api.np.km.playstation.net/store/api/chihiro/…/search/…` |
 | Cart link | `checkout.playstation.com/add/{SKU}?clientId=…` |
-| Hash → SKU | [`site/data/avatar-sku-index.tsv`](site/data/avatar-sku-index.tsv) — 5,415 rows, **5,349 resolvable hashes** (some repeat across game folders) |
+| Hash → SKU | [`site/data/avatar-sku-index.tsv`](site/data/avatar-sku-index.tsv) — 5,350 resolvable hashes. Mostly read from `.edat` files, plus any mapping confirmed by hand |
 | Archive SKUs | [`site/data/avatar-skus.txt`](site/data/avatar-skus.txt), 5,346 unique |
 | **All known SKUs** | [`site/data/all-skus.txt`](site/data/all-skus.txt) — **28,733 unique**, the merged master list |
 | Live catalogue | [`site/data/live-catalog.tsv`](site/data/live-catalog.tsv) — 101,831 rows across 14 stores, 26,435 distinct SKUs, **23,386 absent from the archive** |
