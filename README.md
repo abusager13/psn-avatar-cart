@@ -35,9 +35,6 @@ The split is deliberate: **string and byte rules live in Rust**, where they can 
 where a panic is a compile error rather than a silent `undefined`. Network and DOM stay in JS,
 because that is what the browser is for.
 
-`core/src/lib.rs` has no dependencies — not even wasm-bindgen — so the module is a plain
-`extern "C"` ABI and CI needs nothing beyond `rustup target add wasm32-unknown-unknown`.
-
 ## Build
 
 ```bash
