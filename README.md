@@ -5,28 +5,21 @@ PlayStation Store cart link — and shows you which store regions still sell it.
 
 ### → **https://abusager13.github.io/psn-avatar-cart/**
 
-Static site. No install, no login, no backend.
+Static site. No install, no backend, no account of its own.
 
 ![Result and regional availability](docs/result-us.png)
 
 ## What it does
 
-1. **Input** — paste a 40-character PSNA hash, a full SKU like
-   `UP1004-BLUS30418_00-AVARDRSHADOWWOLF`, or open a `.edat` file (the SKU is read out of its header).
-2. **Resolve** — live catalog lookup for the selected store region: name, platform, price, artwork.
-3. **Regional twin** — the same avatar is a *different product* in each region. If the SKU 404s, the
-   site finds its home store, reads the name there, and matches it in the store you picked.
-4. **Where it's still sold** — probes all 14 tracked stores and streams the results into a table,
-   marking name-matched twins separately from the same product ID.
-5. **Cart** — builds `checkout.playstation.com/add/<SKU>?clientId=…` and opens it in a new tab.
-6. **Shareable** — every lookup becomes a permalink (`?hash=…&region=…`) and recent lookups are
-   kept in this browser only.
-7. **Shutdown countdown** — a live timer for the selected store plus a "closes …" line per region,
-   from Sony's published schedule ([PlayStation.Blog, 1 Jul 2026](https://blog.playstation.com/2026/07/01/an-update-on-playstation-store-for-ps3-and-ps-vita/)):
-   Mexico/Honduras/Nicaragua August 2026, other LatAm and Middle East late 2026, everywhere else
-   July 2027. Only month-level dates were announced, so the timer is an upper bound.
-
-Nothing is purchased here. There is no login, no storage on a server, and no server.
+- **Input** — a PSNA hash, a SKU, or a `.edat` file (the SKU is read out of its header).
+- **Resolve** — live name, platform, price and artwork for the chosen store. If that SKU 404s, the
+  same avatar exists as a *different product* elsewhere, so it finds the regional twin by name.
+- **Availability** — probes all 14 tracked stores and streams the results, ending in either
+  "still on sale in …" or a delisted verdict.
+- **Cart** — `checkout.playstation.com/add/<SKU>` in a new tab. Sony's checkout, so you need a
+  signed-in PlayStation session in that browser.
+- **Extras** — permalinks (`?hash=…&region=…`), recent lookups kept in the browser, and a shutdown
+  countdown per region from Sony's published schedule.
 
 ## Architecture
 
@@ -92,14 +85,9 @@ source. It is not a secret, and not ours.
 
 ## A note on one imported list
 
-`avatar-names.tsv` was derived from a community PS3 avatar table that also carried **RAP licence keys**
-and **direct PKG download links** — i.e. a piracy index. Only `content_id`, `name` and `region` were
-imported. The keys and download links were not read into this project, are not stored anywhere in it,
-and nothing here can install content without a purchase.
-
-The names matter because they fill the archive's real gap: it records a content ID per file but never
-a display name, so a delisted avatar previously resolved to a SKU with no identity. 934 archive SKUs
-now have one.
+`avatar-names.tsv` comes from a community PS3 avatar table. Only `content_id`, `name` and `region` were
+taken — no files, licence keys or download links. It fills the archive's real gap: a content ID with
+no display name.
 
 ## Attribution
 
@@ -124,13 +112,7 @@ On a console, every avatar you own lives in `/dev_hdd0/home/<userid>/psn_avatar/
 
 ## Fonts
 
-- **Homoarakhn** (Dan Zadorozny / Iconian Fonts) — the title face. Iconian's terms allow free
-  **non-commercial** use; commercial use is $20/seat with written consent. This site is a free fan
-  tool with no ads or payments. If that changes, the font must be licensed or removed first.
-- **Orbitron** (SIL OFL 1.1) — fallback title face, shipped with its licence.
-
-Both are self-hosted; nothing is loaded from a third-party font CDN. Full terms in
-[`site/fonts/FONT-LICENSES.md`](site/fonts/FONT-LICENSES.md).
+Homoarakhn and Orbitron, self-hosted. Terms: [`site/fonts/FONT-LICENSES.md`](site/fonts/FONT-LICENSES.md).
 
 ## Legal
 
