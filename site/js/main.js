@@ -150,7 +150,8 @@ function messageFor(error, scanned) {
     case 'notSoldAnywhere': {
       if (!scanned) return `Not sold in ${error.payload.region}.`;
       if (!scanned.length) {
-        return `Not sold in ${error.payload.region}, and not in any of the other ${REGIONS.length - 1} tracked stores either. This item is delisted as far as this site can check.`;
+        return `Delisted — this avatar isn't sold in ${error.payload.region}, nor in any of the other `
+          + `${REGIONS.length - 1} PlayStation stores we check. We queried every one of them.`;
       }
       return `Not sold in ${error.payload.region}. Still on sale in: ${scanned.join(', ')}.`;
     }
