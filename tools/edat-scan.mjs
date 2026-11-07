@@ -19,6 +19,10 @@ import path from 'node:path';
 
 const CATALOG = 'https://store.playstation.com/store/api/chihiro/00_09_000/container';
 
+// These stores answer only in their own language; /en/ returns 404 for items
+// that are on sale.
+const REGION_LANG = { JP: 'ja', DE: 'de', FR: 'fr', IT: 'it', ES: 'es', TR: 'tr', PL: 'pl', SE: 'sv' };
+
 function parseArgs(argv) {
   const args = { dir: null, region: 'US', out: null, lookup: true };
   for (let i = 0; i < argv.length; i += 1) {
@@ -64,11 +68,19 @@ function hashFromName(file) {
 
 async function lookup(cid, region) {
   const base = cid.replace(/-[A-Z][A-Z0-9]{3}$/, '');
-  const url = `${CATALOG}/${region}/en/19/${base}/`;
-  try {
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
-    if (res.status === 404) return { status: 'delisted', name: '', price: '' };
+  const langs = [REGION_LANG[region], 'en'].filter((l, i, a) => l && a.indexOf(l) === i);
+  let delisted = true;
+  for (const lang of langs) {
+    const url = `${CATALOG}/${region}/${lang}/19/${base}/`;
+    let res;
+    try {
+      res = await fetch(url, { headers: { Accept: 'application/json' } });
+    } catch {
+      return { status: 'unknown', name: '', price: '' };
+    }
+    if (res.status === 404) continue;
     if (!res.ok) return { status: 'unknown', name: '', price: '' };
+    delisted = false;
     const data = await res.json();
     const sku = data.default_sku || {};
     return {
@@ -76,9 +88,9 @@ async function lookup(cid, region) {
       name: data.name || '',
       price: sku.display_price || '',
     };
-  } catch {
-    return { status: 'unknown', name: '', price: '' };
   }
+  if (delisted) return { status: 'delisted', name: '', price: '' };
+  return { status: 'unknown', name: '', price: '' };
 }
 
 const args = parseArgs(process.argv.slice(2));

@@ -75,8 +75,13 @@ export async function loadIndex(url) {
   return { hashes: hashes.size, skus: skus.size, built };
 }
 
-async function fetchCatalog(base, region) {
-  const url = `${CATALOG}/${region}/en/19/${base}/`;
+// Several stores serve their catalogue only in their own language: asking JP
+// for /en/ returns 404 even when the item is on sale. Native first, English as
+// the fallback (PL, SE, TR answer to both).
+const REGION_LANG = { JP: 'ja', DE: 'de', FR: 'fr', IT: 'it', ES: 'es', TR: 'tr', PL: 'pl', SE: 'sv' };
+
+async function fetchCatalogLang(base, region, lang) {
+  const url = `${CATALOG}/${region}/${lang}/19/${base}/`;
   let response;
   try {
     response = await fetch(url, { headers: { Accept: 'application/json' } });
@@ -91,6 +96,22 @@ async function fetchCatalog(base, region) {
     throw new LookupError('transport', { message: 'unparseable catalog JSON' });
   }
 }
+
+async function fetchCatalog(base, region) {
+  const langs = [REGION_LANG[region], 'en'].filter((l, i, a) => l && a.indexOf(l) === i);
+  let notSold = null;
+  for (const lang of langs) {
+    try {
+      return await fetchCatalogLang(base, region, lang);
+    } catch (error) {
+      if (error.kind !== 'notSold') throw error;
+      notSold = error;
+    }
+  }
+  throw notSold || new LookupError('notSold', { region, base });
+}
+
+export { fetchCatalog as fetchItem };
 
 function trustedImage(value) {
   if (typeof value !== 'string') return null;
