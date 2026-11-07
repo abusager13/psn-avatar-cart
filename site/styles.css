@@ -504,3 +504,25 @@ td.a { text-align: right; }
 .badge.live { color: #7fc08a; border-color: #2d4a33; background: #1a241c; }
 .av-sku.hash { opacity: .55; font-size: 9px; }
 .av-meta { align-items: center; }
+
+.gh {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  color: var(--muted);
+  border: 1px solid transparent;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.gh:hover { color: var(--text); border-color: var(--border); background: var(--panel); }
+#app { position: relative; }
+
+@media (max-width: 560px) {
+  .gh { top: 10px; right: 10px; width: 30px; height: 30px; }
+  .hero h1, .hero .crumb { padding-right: 42px; }
+}

@@ -66,7 +66,7 @@ export function renderCard(card, data, note, handlers) {
       <a class="btn primary" href="${esc(data.link)}" target="_blank" rel="noopener noreferrer">Add to cart ↗</a>
       <button class="btn ghost" type="button" data-act="copy">Copy cart link</button>
       <button class="btn ghost" type="button" data-act="share">Copy page link</button>
-      <span class="hint">Opens PlayStation's checkout in a new tab.</span>
+      <span class="hint">Opens Sony's checkout — be signed in to your PlayStation account.</span>
     </div>`;
 
   card.querySelector('[data-act="copy"]').addEventListener('click', async (event) => {
