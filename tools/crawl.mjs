@@ -26,6 +26,7 @@ const arg = (name, fallback) => {
 const REGIONS = arg('regions', 'US,GB,CA,IE,DE,FR,IT,ES,PL,SE,TR,AU,ZA,JP').split(',').map((r) => r.trim().toUpperCase());
 const ROUNDS = Number(arg('rounds', 2));
 const WORKERS = Number(arg('workers', 10));
+const PAGES = Number(arg('pages', 50));      // 50 × 20 = the 1,000-row cap
 const LIMIT = Number(arg('limit', 0));       // cap the seed, for a smoke test
 const DRY = ARGS.includes('--dry');          // crawl but do not write
 const STORE = 'site/data/live-catalog.tsv';
@@ -83,10 +84,10 @@ async function crawlRegion(region, seedNames) {
     const worker = async () => {
       while (cursor < todo.length) {
         const term = todo[cursor++];
-        for (const start of [0, 20]) {
+        for (let start = 0; start < PAGES * 20; start += 20) {
           const data = await search(region, lang, term, start);
-          for (const item of data.links || []) {
-            if (item.top_category !== 'avatar' || !item.id) continue;
+          const items = (data.links || []).filter((i) => i.top_category === 'avatar' && i.id);
+          for (const item of items) {
             if (!found.has(item.id)) {
               found.set(item.id, {
                 name: item.name || '',
@@ -94,6 +95,8 @@ async function crawlRegion(region, seedNames) {
               });
             }
           }
+          // a short page means the query is exhausted; stop paging it
+          if (items.length < 20) break;
         }
       }
     };
@@ -127,13 +130,14 @@ async function main() {
       continue;
     }
 
-    // Replace this region's rows, keep every other region untouched.
+    // Union, not replace: a crawl must never delete a row it did not re-find.
     const keep = rows.filter((r) => r[3] !== region);
-    for (const [sku, v] of found) keep.push([sku, v.name, v.price, region]);
+    const merged = new Map(rows.filter((r) => r[3] === region).map((r) => [r[0], r]));
+    for (const [sku, v] of found) merged.set(sku, [sku, v.name, v.price, region]);
 
     await writeFile(STORE, 'sku\tname\tprice\tregion\tin_archive\n'
-      + keep.map((r) => r.slice(0, 4).join('\t') + '\t' + (r[4] || 'no')).join('\n') + '\n');
-    console.log(`${region}: ${found.size} listings written`);
+      + [...keep, ...merged.values()].map((r) => r.slice(0, 4).join('\t') + '\t' + (r[4] || 'no')).join('\n') + '\n');
+    console.log(`${region}: ${merged.size} listings on file (${found.size} seen this run)`);
   }
 
   console.log('\nnow run: node tools/build-data.mjs');
