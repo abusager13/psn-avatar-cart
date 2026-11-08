@@ -41,13 +41,15 @@ Pushing to `main` builds the core and publishes `site/` to Pages.
 
 ## Data
 
+<!-- data:start -->
 | File | Contents |
 |---|---|
-| [`avatar-sku-index.tsv`](site/data/avatar-sku-index.tsv) | 5,350 hashes → SKUs, read out of `.edat` headers |
-| [`all-skus.txt`](site/data/all-skus.txt) | 30,234 unique SKUs — the master list |
-| [`live-catalog.tsv`](site/data/live-catalog.tsv) | 103,737 listings across 14 stores, 28,341 distinct SKUs, 24,888 absent from the archive |
-| [`archive.tsv`](site/data/archive.tsv) | 1,913 hashes that resolve but are sold in no store |
-| [`avatar-names.tsv`](site/data/avatar-names.tsv) | 1,365 display names, 934 of them new to the archive |
+| `avatar-sku-index.tsv` | 5,350 hashes → SKUs, read out of `.edat` headers |
+| `all-skus.txt` | 30,527 unique SKUs — the master list |
+| `live-catalog.tsv` | 103,871 listings across 14 stores, 28,475 distinct SKUs, 25,180 absent from the archive |
+| `archive.tsv` | 1,902 hashes that resolve but are sold in no store |
+| `avatar-names.tsv` | 1,365 display names, 924 of them new to the archive |
+<!-- data:end -->
 
 ## No backend
 
