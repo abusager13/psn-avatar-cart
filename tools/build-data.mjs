@@ -27,20 +27,25 @@ const MARK_END = '<!-- data:end -->';
 
 const read = async (file) => (existsSync(file) ? readFile(file, 'utf8') : '');
 
-function rows(text) {
-  return text.split('\n').slice(1).filter(Boolean).map((line) => line.split('\t'));
+function rows(text, expected, file) {
+  const lines = text.split('\n').slice(1).filter(Boolean);
+  const bad = lines.filter((l) => l.split('\t').length !== expected);
+  if (bad.length) {
+    console.warn(`warning: ${bad.length} malformed row(s) in ${file} — first: ${bad[0].slice(0, 90)}`);
+  }
+  return lines.map((line) => line.split('\t'));
 }
 
 async function load() {
-  const live = rows(await read(`${D}live-catalog.tsv`))
+  const live = rows(await read(`${D}live-catalog.tsv`), 5, 'live-catalog.tsv')
     .filter((r) => r[0] && r[3])
     .map(([sku, name, price, region]) => ({ sku, name, price, region }));
 
-  const index = rows(await read(`${D}avatar-sku-index.tsv`))
+  const index = rows(await read(`${D}avatar-sku-index.tsv`), 3, 'avatar-sku-index.tsv')
     .filter((r) => r[0] && r[2])
     .map(([hash, game, sku]) => ({ hash, game, sku }));
 
-  const names = new Map(rows(await read(`${D}avatar-names.tsv`))
+  const names = new Map(rows(await read(`${D}avatar-names.tsv`), 3, 'avatar-names.tsv')
     .filter((r) => r[0])
     .map(([sku, name]) => [sku, name]));
 

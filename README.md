@@ -45,9 +45,9 @@ Pushing to `main` builds the core and publishes `site/` to Pages.
 | File | Contents |
 |---|---|
 | `avatar-sku-index.tsv` | 5,350 hashes → SKUs, read out of `.edat` headers |
-| `all-skus.txt` | 30,960 unique SKUs — the master list |
-| `live-catalog.tsv` | 104,732 listings across 14 stores, 28,945 distinct SKUs, 25,613 absent from the archive |
-| `archive.tsv` | 1,873 hashes that resolve but are sold in no store |
+| `all-skus.txt` | 32,540 unique SKUs — the master list |
+| `live-catalog.tsv` | 107,884 listings across 14 stores, 30,605 distinct SKUs, 27,193 absent from the archive |
+| `archive.tsv` | 1,803 hashes that resolve but are sold in no store |
 | `avatar-names.tsv` | 1,365 display names, 924 of them new to the archive |
 <!-- data:end -->
 

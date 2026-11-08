@@ -50,7 +50,16 @@ function tokens(names) {
 
 async function loadRows() {
   const text = await readFile(STORE, 'utf8');
-  return text.split('\n').slice(1).filter(Boolean).map((line) => line.split('\t'));
+  return text.split('\n').slice(1).filter(Boolean).map((line) => {
+    const parts = line.split('\t');
+    if (parts.length === 4) return parts;
+    // A row with extra fields means a tab slipped into a name or price; put the
+    // pieces back where they belong rather than writing it straight back out.
+    const [sku = '', name = '', ...rest] = parts;
+    const price = rest.find((x) => /^(Free|[$£€])/.test(x)) || '';
+    const region = rest.find((x) => /^[A-Z]{2}$/.test(x)) || '';
+    return [sku, name, price, region];
+  });
 }
 
 async function search(region, lang, term, start) {
