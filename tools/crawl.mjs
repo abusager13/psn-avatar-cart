@@ -80,6 +80,9 @@ async function crawlRegion(region, seedNames) {
     if (!todo.length) break;
     const before = found.size;
     let cursor = 0;
+    let finished = 0;
+    const startedAt = Date.now();
+    console.log(`  ${region} round ${round}: ${todo.length} terms queued`);
 
     const worker = async () => {
       while (cursor < todo.length) {
@@ -97,6 +100,16 @@ async function crawlRegion(region, seedNames) {
           }
           // a short page means the query is exhausted; stop paging it
           if (items.length < 20) break;
+        }
+
+        // Heartbeat: without this a long round looks like a hang, because the
+        // round total is only printed once everything is done.
+        finished += 1;
+        if (finished % 50 === 0) {
+          const secs = (Date.now() - startedAt) / 1000;
+          const rate = (finished / secs).toFixed(1);
+          const eta = Math.round((todo.length - finished) / Math.max(finished / secs, 0.01) / 60);
+          console.log(`    ${region} r${round}: ${finished}/${todo.length} terms, +${found.size - before} new, ${rate}/s, ~${eta}m left`);
         }
       }
     };
