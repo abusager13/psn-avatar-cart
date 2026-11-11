@@ -589,3 +589,20 @@ td.a { text-align: right; }
   background: var(--panel-hi);
 }
 div.av-img { background: var(--panel-hi); }
+
+/* One-time intro clip. Fades out on its own, or on a click. */
+html.splashing { overflow: hidden; }
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #05070a;
+  transition: opacity .9s ease;
+}
+.splash video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.splash.leaving { opacity: 0; pointer-events: none; }
