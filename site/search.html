@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Search — PS3 Avatars</title>
+    <meta name="description" content="Search the PlayStation Store for an avatar by name, live, in the region you pick." />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  </head>
+  <body>
+    <main id="app" class="wide">
+      <nav class="topbar" aria-label="Sections">
+        <a class="tab" href="./">Home</a>
+        <a class="tab active" href="search.html">Search</a>
+        <a class="tab" href="catalog.html">Catalogue</a>
+        <a class="tab" href="archive.html">Delisted</a>
+        <a class="gh" href="https://github.com/abusager13/psn-avatar-cart" target="_blank" rel="noopener noreferrer"
+           aria-label="Source code on GitHub" title="Source on GitHub">
+          <svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+              0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01
+              1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95
+              0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0
+              1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15
+              0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38
+              A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+          </svg>
+        </a>
+      </nav>
+
+      <header class="hero">
+        <h1>Search</h1>
+        <p class="tagline">
+          Type an avatar's name and the query goes straight to the PlayStation Store — no index of ours in
+          the middle. Pick the region whose store you want to search.
+        </p>
+      </header>
+
+      <section class="tool">
+        <div class="row">
+          <label class="field">
+            <span class="sr-only">Search the store by avatar name</span>
+            <input id="q" type="search" placeholder="e.g. shadow wolf, ada vampire, toro…" autocomplete="off" spellcheck="false" />
+          </label>
+          <button id="clear" class="btn ghost" type="button">Clear</button>
+        </div>
+        <div id="regions" class="chips" role="group" aria-label="Store region"></div>
+        <p id="status" class="count">Pick a store and type a name.</p>
+      </section>
+
+      <section id="results" class="grid" aria-live="polite"></section>
+
+      <div class="more-wrap">
+        <button id="more" class="btn ghost hidden" type="button">Load more</button>
+      </div>
+
+      <footer class="foot">
+        <p>
+          Results come from <code>commerce1.api.np.km.playstation.net</code> — the same search the store
+          front-end calls, filtered to avatars. Each one links to Sony's checkout, so be signed in to your
+          PlayStation account in this browser.
+        </p>
+        <p class="tiny">
+          Unofficial fan tool. Not affiliated with, endorsed by, or sponsored by Sony Interactive
+          Entertainment. Prices are per-region and not directly comparable.
+        </p>
+      </footer>
+    </main>
+    <script type="module" src="js/search.js?v=__V__"></script>
+  </body>
+</html>
