@@ -16,7 +16,9 @@ function video(src, { loop = false } = {}) {
   v.className = 'splash-video';
   v.muted = true;
   v.playsInline = true;
+  v.defaultMuted = true;
   v.loop = loop;
+  if (loop) v.setAttribute('loop', '');
   v.preload = 'auto';
   v.setAttribute('aria-hidden', 'true');
   v.src = `${src}?v=__V__`;
@@ -40,6 +42,8 @@ function resumeAmbient() {
   el.classList.add('on');
   attach(el);
 
+  el.addEventListener('ended', () => { el.currentTime = 0; el.play().catch(() => {}); });
+
   const saved = Number(sessionStorage.getItem(POS) || 0);
   const start = () => {
     if (saved > 0 && Number.isFinite(saved)) {
@@ -52,6 +56,10 @@ function resumeAmbient() {
 
   window.addEventListener('pagehide', () => {
     sessionStorage.setItem(POS, String(el.currentTime || 0));
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && el.paused) el.play().catch(() => {});
   });
 }
 
@@ -80,6 +88,8 @@ function intro() {
     if (ambientMode || finished) return;
     ambientMode = true;
     el.loop = true;
+    el.setAttribute('loop', '');
+    el.addEventListener('ended', () => { el.currentTime = 0; el.play().catch(() => {}); });
     wrap.classList.add('ambient');
     document.documentElement.classList.add('ambient');
     document.documentElement.classList.remove('splashing');

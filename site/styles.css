@@ -622,10 +622,9 @@ html.ambient, html.ambient body { background: transparent; }
   transition: opacity 1.4s ease;
 }
 .splash.ambient .splash-video {
-  /* The ascii footage is mostly black: screen blending drops the black and lets
-     the bright band glow over the page instead of sitting behind it as murk. */
-  mix-blend-mode: screen;
-  filter: brightness(1.5) contrast(1.05) saturate(1.2);
+  /* Mostly-black footage: lift it, and let the dark areas sit on the page's own
+     dark background rather than painting over it. */
+  filter: brightness(1.55) contrast(1.05) saturate(1.15);
 }
 .splash.ambient::after {
   content: '';
