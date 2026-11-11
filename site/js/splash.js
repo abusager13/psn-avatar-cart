@@ -1,7 +1,8 @@
-// One-time intro: a short clip, a crossfade into the XMB wave, then the page.
-// Skipped on repeat visits and under prefers-reduced-motion.
+// Intro splash: a short clip, crossfading into the XMB wave, which then keeps
+// looping as the site's ambient background. Skipped on repeat visits and under
+// prefers-reduced-motion.
 
-const KEY = 'ps3avatars.splash.v2';
+const KEY = 'ps3avatars.splash.v3';
 const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const CLIPS = ['media/ps3back.mp4', 'media/ps3-xmb.mp4'];
 
@@ -27,8 +28,13 @@ function play() {
   document.body.appendChild(wrap);
   document.documentElement.classList.add('splashing');
 
+  let index = 0;
+  let previous = null;
+  let ambientMode = false;
   let finished = false;
-  const done = () => {
+
+  /** Drop the overlay entirely — used only when the video cannot play. */
+  const remove = () => {
     if (finished) return;
     finished = true;
     wrap.classList.add('leaving');
@@ -36,11 +42,19 @@ function play() {
     setTimeout(() => wrap.remove(), 1100);
   };
 
-  let index = 0;
-  let previous = null;
+  /** Hand the wave over to the page: behind the content, looping, not blocking. */
+  const goAmbient = (el) => {
+    if (ambientMode || finished) return;
+    ambientMode = true;
+    el.loop = true;
+    wrap.classList.add('ambient');
+    document.documentElement.classList.add('ambient');
+    document.documentElement.classList.remove('splashing');
+  };
+
   const show = () => {
-    if (finished) return;
-    if (index >= CLIPS.length) { done(); return; }
+    if (ambientMode || finished) return;
+    if (index >= CLIPS.length) { remove(); return; }
 
     const current = video(CLIPS[index]);
     wrap.appendChild(current);
@@ -50,21 +64,45 @@ function play() {
     }
     previous = current;
 
+    const isLast = index === CLIPS.length - 1;
     const advance = () => {
       current.removeEventListener('ended', advance);
       current.removeEventListener('error', advance);
       index += 1;
       show();
     };
-    current.addEventListener('ended', advance);
-    current.addEventListener('error', advance);
+    if (!isLast) {
+      current.addEventListener('ended', advance);
+    }
+    current.addEventListener('error', () => (isLast ? remove() : advance()));
+
     current.play().then(() => {
       requestAnimationFrame(() => current.classList.add('on'));
-    }).catch(advance);
+      if (isLast) {
+        // once the crossfade has finished, the wave becomes the background
+        setTimeout(() => goAmbient(current), 1200);
+      }
+    }).catch(() => (isLast ? remove() : advance()));
   };
 
-  wrap.addEventListener('click', done);
-  setTimeout(done, 45000); // safety net
+  // A click skips straight to the wave in ambient mode.
+  wrap.addEventListener('click', () => {
+    if (ambientMode) return;
+    wrap.querySelectorAll('video').forEach((v) => v.remove());
+    previous = null;
+    index = CLIPS.length - 1;
+    show();
+  });
+
+  // Don't decode video in a hidden tab.
+  document.addEventListener('visibilitychange', () => {
+    const v = wrap.querySelector('.splash-video.on');
+    if (!v) return;
+    if (document.hidden) v.pause();
+    else if (!finished) v.play().catch(() => {});
+  });
+
+  setTimeout(remove, 45000); // safety net if nothing ever plays
   show();
 }
 

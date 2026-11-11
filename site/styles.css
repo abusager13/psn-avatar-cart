@@ -611,6 +611,23 @@ html.splashing { overflow: hidden; }
 }
 .splash-video.on { opacity: 1; }
 .splash.leaving { opacity: 0; pointer-events: none; }
+
+/* Ambient mode: the wave drops behind the page and keeps looping, dimmed so the
+   text stays readable. */
+html.ambient, html.ambient body { background: transparent; }
+.splash.ambient {
+  z-index: -1;
+  opacity: .63;
+  pointer-events: none;
+  transition: opacity 1.4s ease;
+}
+.splash.ambient::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(1100px 520px at 50% 0%, rgba(5, 7, 10, .22), rgba(5, 7, 10, .78) 75%);
+}
+.splash.ambient .splash-skip { display: none; }
 .splash-skip {
   position: absolute;
   right: 16px;
