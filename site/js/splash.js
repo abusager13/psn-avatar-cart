@@ -2,9 +2,9 @@
 // looping as the site's ambient background. Skipped on repeat visits and under
 // prefers-reduced-motion.
 
-const KEY = 'ps3avatars.splash.v3';
+const KEY = 'ps3avatars.splash.v4';
 const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const CLIPS = ['media/ps3back.mp4', 'media/ps3-xmb.mp4'];
+const CLIPS = ['media/ps3back.mp4', 'media/ps3-ascii.mp4'];
 
 function video(src) {
   const v = document.createElement('video');

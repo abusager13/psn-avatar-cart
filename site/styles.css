@@ -612,8 +612,8 @@ html.splashing { overflow: hidden; }
 .splash-video.on { opacity: 1; }
 .splash.leaving { opacity: 0; pointer-events: none; }
 
-/* Ambient mode: the wave drops behind the page and keeps looping, dimmed so the
-   text stays readable. */
+/* Ambient mode: the clip drops behind the page and keeps looping, dimmed so the
+   text stays readable. The ASCII footage is mostly black, so it gets a lift. */
 html.ambient, html.ambient body { background: transparent; }
 .splash.ambient {
   z-index: -1;
@@ -621,11 +621,14 @@ html.ambient, html.ambient body { background: transparent; }
   pointer-events: none;
   transition: opacity 1.4s ease;
 }
+.splash.ambient .splash-video {
+  filter: brightness(1.45) contrast(1.02) saturate(1.1);
+}
 .splash.ambient::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(1100px 520px at 50% 0%, rgba(5, 7, 10, .10), rgba(5, 7, 10, .62) 78%);
+  background: radial-gradient(1100px 520px at 50% 0%, rgba(5, 7, 10, .18), rgba(5, 7, 10, .68) 80%);
 }
 .splash.ambient .splash-skip { display: none; }
 .splash-skip {
