@@ -617,7 +617,7 @@ html.splashing { overflow: hidden; }
 html.ambient, html.ambient body { background: transparent; }
 .splash.ambient {
   z-index: -1;
-  opacity: .63;
+  opacity: .92;
   pointer-events: none;
   transition: opacity 1.4s ease;
 }
@@ -625,7 +625,7 @@ html.ambient, html.ambient body { background: transparent; }
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(1100px 520px at 50% 0%, rgba(5, 7, 10, .22), rgba(5, 7, 10, .78) 75%);
+  background: radial-gradient(1100px 520px at 50% 0%, rgba(5, 7, 10, .10), rgba(5, 7, 10, .62) 78%);
 }
 .splash.ambient .splash-skip { display: none; }
 .splash-skip {
