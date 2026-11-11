@@ -617,12 +617,15 @@ html.splashing { overflow: hidden; }
 html.ambient, html.ambient body { background: transparent; }
 .splash.ambient {
   z-index: -1;
-  opacity: .92;
+  opacity: 1;
   pointer-events: none;
   transition: opacity 1.4s ease;
 }
 .splash.ambient .splash-video {
-  filter: brightness(1.45) contrast(1.02) saturate(1.1);
+  /* The ascii footage is mostly black: screen blending drops the black and lets
+     the bright band glow over the page instead of sitting behind it as murk. */
+  mix-blend-mode: screen;
+  filter: brightness(1.5) contrast(1.05) saturate(1.2);
 }
 .splash.ambient::after {
   content: '';
