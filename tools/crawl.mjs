@@ -25,7 +25,7 @@ const arg = (name, fallback) => {
 
 const REGIONS = arg('regions', 'US,GB,CA,IE,DE,FR,IT,ES,PL,SE,TR,AU,ZA,JP').split(',').map((r) => r.trim().toUpperCase());
 const ROUNDS = Number(arg('rounds', 2));
-const WORKERS = Number(arg('workers', 10));
+const WORKERS = Number(arg('workers', 8));
 const PAGES = Number(arg('pages', 50));      // 50 × 20 = the 1,000-row cap
 const LIMIT = Number(arg('limit', 0));       // cap the seed, for a smoke test
 const DRY = ARGS.includes('--dry');          // crawl but do not write
@@ -62,17 +62,29 @@ async function loadRows() {
   });
 }
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 async function search(region, lang, term, start) {
   const url = `${SEARCH}/${region}/${lang}/19/${encodeURIComponent(term)}`
     + `?top_category=avatar&start=${start}`;
+  // Politeness: a little jitter on every call so workers do not move in lockstep,
+  // and obey Retry-After instead of retrying into a rate limit.
+  await sleep(20 + Math.random() * 60);
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       const res = await fetch(url, { headers: { 'User-Agent': 'ps3-avatars/1.0', Accept: 'application/json' } });
+      if (res.status === 429 || res.status === 503) {
+        const hint = Number(res.headers.get('Retry-After'));
+        const wait = (Number.isFinite(hint) && hint > 0 ? hint * 1000 : 2 ** attempt * 800)
+          + Math.random() * 400;
+        await sleep(wait);
+        continue;
+      }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch (error) {
       if (attempt === 2) return {};
-      await new Promise((r) => setTimeout(r, 600 * (attempt + 1)));
+      await sleep(600 * (attempt + 1) + Math.random() * 300);
     }
   }
   return {};

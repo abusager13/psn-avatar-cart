@@ -44,6 +44,15 @@ python3 -m http.server -d site 8731
 
 Pushing to `main` builds the CSS and publishes `site/` to Pages.
 
+## Talking to Sony
+
+The store sends `cache-control: max-age=300`, so every catalogue answer — including
+"not sold here" — is cached for five minutes, kept in `sessionStorage` so it survives
+navigation and reload, and never requested twice concurrently. A repeated lookup costs
+zero requests. The site backs off on `429`/`503` using `Retry-After` with jitter instead
+of retrying into the limit, caps the availability scan at four parallel workers, and
+staggers them so the fourteen probes don't travel in lockstep.
+
 ## No backend
 
 Sony's legacy catalog endpoint sends `Access-Control-Allow-Origin: *`, so the browser queries it

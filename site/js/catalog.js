@@ -82,34 +82,94 @@ export async function loadIndex(url) {
 // the fallback (PL, SE, TR answer to both).
 const REGION_LANG = { JP: 'ja', DE: 'de', FR: 'fr', IT: 'it', ES: 'es', TR: 'tr', PL: 'pl', SE: 'sv' };
 
-// One lookup can ask for the same store record several times (resolve, home
-// name, availability). Identical URLs are shared for a minute, including
-// "not sold" answers, so a delisted avatar stops costing four identical fetches.
-const requestCache = new Map();
-const REQUEST_TTL = 60000;
+// Politeness + speed, in the order that matters:
+//   1. cache every answer (success and 404) for as long as the store's own
+//      Cache-Control allows, and keep it across page loads for the session
+//   2. back off when the server says so (429/503 + Retry-After), with jitter
+//   3. never ask the same URL twice concurrently
+const TTL = 300000;          // the store sends cache-control: max-age=300
+const MAX_ENTRIES = 150;
+const CACHE_KEY = 'psnacart.catalog.v1';
+
+function loadCache() {
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(CACHE_KEY) || '{}');
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+let store = loadCache();
+const inflight = new Map();
+
+function cacheGet(url) {
+  const hit = store[url];
+  if (!hit || Date.now() - hit.at > TTL) return null;
+  return hit;
+}
+
+function cacheSet(url, entry) {
+  store[url] = { at: Date.now(), ...entry };
+  const keys = Object.keys(store);
+  if (keys.length > MAX_ENTRIES) {
+    keys.sort((a, b) => store[a].at - store[b].at)
+      .slice(0, keys.length - MAX_ENTRIES)
+      .forEach((k) => delete store[k]);
+  }
+  try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(store)); } catch { /* quota */ }
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function requestJson(url, attempt = 0) {
+  let response;
+  try {
+    response = await fetch(url, { headers: { Accept: 'application/json' } });
+  } catch (error) {
+    throw new LookupError('transport', { message: error.message });
+  }
+
+  if (response.status === 429 || response.status === 503) {
+    if (attempt >= 2) throw new LookupError('transport', { message: `HTTP ${response.status}` });
+    const hint = Number(response.headers.get('Retry-After'));
+    const wait = (Number.isFinite(hint) && hint > 0 ? hint * 1000 : 2 ** attempt * 500)
+      + Math.random() * 400;
+    await sleep(wait);
+    return requestJson(url, attempt + 1);
+  }
+
+  if (response.status === 404) return { notSold: true };
+  if (!response.ok) throw new LookupError('transport', { message: `HTTP ${response.status}` });
+  try {
+    return { data: await response.json() };
+  } catch {
+    throw new LookupError('transport', { message: 'unparseable catalog JSON' });
+  }
+}
 
 function cachedFetch(url) {
-  const hit = requestCache.get(url);
-  if (hit && Date.now() - hit.at < REQUEST_TTL) return hit.promise;
+  const hit = cacheGet(url);
+  if (hit) {
+    return hit.notSold
+      ? Promise.reject(new LookupError('notSold', { region: '', base: '' }))
+      : Promise.resolve(hit.data);
+  }
 
-  const promise = (async () => {
-    let response;
-    try {
-      response = await fetch(url, { headers: { Accept: 'application/json' } });
-    } catch (error) {
-      throw new LookupError('transport', { message: error.message });
-    }
-    if (response.status === 404) throw new LookupError('notSold', { region: '', base: '' });
-    if (!response.ok) throw new LookupError('transport', { message: `HTTP ${response.status}` });
-    try {
-      return await response.json();
-    } catch {
-      throw new LookupError('transport', { message: 'unparseable catalog JSON' });
-    }
-  })();
+  if (inflight.has(url)) return inflight.get(url);
 
-  requestCache.set(url, { at: Date.now(), promise });
-  promise.catch(() => {}); // rejected entries are still valid answers
+  const promise = requestJson(url).then((result) => {
+    cacheSet(url, result);
+    inflight.delete(url);
+    if (result.notSold) throw new LookupError('notSold', { region: '', base: '' });
+    return result.data;
+  }, (error) => {
+    inflight.delete(url);
+    throw error;
+  });
+
+  promise.catch(() => {}); // callers handle it; avoid unhandled-rejection noise
+  inflight.set(url, promise);
   return promise;
 }
 
@@ -293,6 +353,9 @@ export async function availability(base, sourceName, home, onRow) {
 
   const queue = REGIONS.map((r) => r.code);
   const worker = async () => {
+    // Stagger the workers by a few tens of milliseconds so a scan does not hit
+    // the store with four simultaneous requests at every step.
+    await new Promise((r) => setTimeout(r, Math.random() * 120));
     while (queue.length) {
       const code = queue.shift();
       onRow({ region: code, status: 'checking' });
