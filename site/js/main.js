@@ -1,6 +1,7 @@
 // Wiring: state, events, URL permalinks, recent lookups.
 
 import { core, ERR } from './core.js';
+import { randomSku } from './example.js';
 import {
   REGIONS, LookupError, isRegion, loadIndex, resolveInput, availability, cardFromRegion,
   fetchItem as catalogFetchItem,
@@ -385,11 +386,11 @@ el.permalinkCopy.addEventListener('click', async () => {
 
 const example = document.getElementById('example');
 if (example) {
-  example.addEventListener('click', () => {
-    el.input.value = 'B19E79472B5D7F475C9FEAFC93FF7F2A6C4DEDAB';
-    state.region = 'GB';
-    renderChips(el.chips, REGIONS, 'GB', pickRegion);
-    run(el.input.value, 'GB');
+  example.addEventListener('click', async () => {
+    const sku = await randomSku();
+    if (!sku) return;
+    el.input.value = sku;
+    run(sku, state.region);
   });
 }
 

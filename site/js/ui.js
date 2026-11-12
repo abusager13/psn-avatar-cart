@@ -1,6 +1,7 @@
 // Rendering only. Everything here takes data and returns DOM; no network.
 
 import { closureFor } from './catalog.js';
+import { randomSku } from './example.js';
 
 const DAY = 86400000;
 
@@ -46,8 +47,15 @@ export function renderEmpty(card) {
         Try <button class="link link-primary link-hover" id="example" type="button">an example</button>.
       </span>
     </div>`;
-  card.querySelector('#example')?.addEventListener('click', () => {
-    document.getElementById('input').value = 'UP1004-BLUS30418_00-AVARDRSHADOWWOLF';
+  card.querySelector('#example')?.addEventListener('click', async (event) => {
+    const button = event.currentTarget;
+    button.textContent = 'picking one…';
+    const sku = await randomSku();
+    if (!sku) {
+      button.textContent = 'an example';
+      return;
+    }
+    document.getElementById('input').value = sku;
     document.getElementById('go').click();
   });
 }
