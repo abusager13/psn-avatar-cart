@@ -161,7 +161,7 @@ export async function resolveInput(rawInput, region) {
     sku = hit.value;
     hash = cleaned;
     source = 'PSNA hash → SKU';
-  } else if (cleaned.includes('-') && cleaned.includes('_')) {
+  } else if (core.isContentId(cleaned)) {
     sku = cleaned;
     source = 'SKU';
   } else {
@@ -225,15 +225,23 @@ async function findTwin(base, home, targetRegion) {
     return null;
   }
 
+  // Containment alone is loose: "cat" sits inside "catalogue cat". Collect the
+  // candidates and score them, so the closest name wins rather than the first.
+  if (wanted.length < 6) return null;
+
+  let best = null;
   for (const item of payload?.links || []) {
     if (item.top_category !== 'avatar') continue;
     const candidate = core.normName(item.name).value;
-    if (!candidate) continue;
-    if (core.namesMatch(candidate, wanted)) {
-      return { sku: item.id, sourceName };
-    }
+    if (!candidate || !core.namesMatch(candidate, wanted)) continue;
+
+    const score = candidate === wanted
+      ? 1
+      : Math.min(candidate.length, wanted.length) / Math.max(candidate.length, wanted.length);
+    if (score < 0.6) continue;
+    if (!best || score > best.score) best = { sku: item.id, sourceName, score };
   }
-  return null;
+  return best;
 }
 
 /** Probe every region for this product, streaming rows back as they land. */

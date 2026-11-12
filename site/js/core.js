@@ -101,9 +101,18 @@ function namesMatch(a, b) {
   return x.includes(y) || y.includes(x);
 }
 
+/**
+ * A store product ID always looks like `XX1234-TITLEID_NN-REST`. Anything else
+ * is a typo or junk, and sending it upstream only produces noise.
+ */
+export function isContentId(value) {
+  return /^[A-Z]{2}\d{4}-[A-Z0-9]{4,}_\d{2}-[A-Z0-9]+$/.test(String(value ?? '').trim());
+}
+
 /** The cart deep-link Sony's own store uses. */
 function cartLink(sku) {
-  return ok(`${CHECKOUT}/${String(sku ?? '').trim()}?clientId=${CLIENT_ID}`);
+  const clean = String(sku ?? '').trim();
+  return ok(`${CHECKOUT}/${encodeURIComponent(clean)}?clientId=${CLIENT_ID}`);
 }
 
 /* ---------------------------------------------------------------- EDAT */
@@ -123,14 +132,7 @@ function decodeEdat(bytes) {
 }
 
 function validContentId(cid) {
-  if (cid.length < 14) return false;
-  if (!/^[A-Z]{2}\d{4}-/.test(cid)) return false;           // XX1234-
-  const rest = cid.slice(7);
-  const m = rest.match(/^([A-Z0-9]{4,})(.*)$/);              // TITLEID
-  if (!m) return false;
-  const after = m[2];
-  if (!after.startsWith('_')) return false;                  // _NN-
-  return /^\d{2}-/.test(after.slice(1));
+  return isContentId(cid);
 }
 
 /* ---------------------------------------------------------------- index */
@@ -163,6 +165,7 @@ function lookup(hash) {
 
 export const core = {
   ready: () => true,
+  isContentId,
   normalizeInput,
   stripVariant,
   homeRegion,
