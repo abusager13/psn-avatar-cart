@@ -82,20 +82,44 @@ export async function loadIndex(url) {
 // the fallback (PL, SE, TR answer to both).
 const REGION_LANG = { JP: 'ja', DE: 'de', FR: 'fr', IT: 'it', ES: 'es', TR: 'tr', PL: 'pl', SE: 'sv' };
 
+// One lookup can ask for the same store record several times (resolve, home
+// name, availability). Identical URLs are shared for a minute, including
+// "not sold" answers, so a delisted avatar stops costing four identical fetches.
+const requestCache = new Map();
+const REQUEST_TTL = 60000;
+
+function cachedFetch(url) {
+  const hit = requestCache.get(url);
+  if (hit && Date.now() - hit.at < REQUEST_TTL) return hit.promise;
+
+  const promise = (async () => {
+    let response;
+    try {
+      response = await fetch(url, { headers: { Accept: 'application/json' } });
+    } catch (error) {
+      throw new LookupError('transport', { message: error.message });
+    }
+    if (response.status === 404) throw new LookupError('notSold', { region: '', base: '' });
+    if (!response.ok) throw new LookupError('transport', { message: `HTTP ${response.status}` });
+    try {
+      return await response.json();
+    } catch {
+      throw new LookupError('transport', { message: 'unparseable catalog JSON' });
+    }
+  })();
+
+  requestCache.set(url, { at: Date.now(), promise });
+  promise.catch(() => {}); // rejected entries are still valid answers
+  return promise;
+}
+
 async function fetchCatalogLang(base, region, lang) {
   const url = `${CATALOG}/${region}/${lang}/19/${base}/`;
-  let response;
   try {
-    response = await fetch(url, { headers: { Accept: 'application/json' } });
+    return await cachedFetch(url);
   } catch (error) {
-    throw new LookupError('transport', { message: error.message });
-  }
-  if (response.status === 404) throw new LookupError('notSold', { region, base });
-  if (!response.ok) throw new LookupError('transport', { message: `HTTP ${response.status}` });
-  try {
-    return await response.json();
-  } catch {
-    throw new LookupError('transport', { message: 'unparseable catalog JSON' });
+    if (error.kind === 'notSold') throw new LookupError('notSold', { region, base });
+    throw error;
   }
 }
 
@@ -199,15 +223,17 @@ export async function resolveInput(rawInput, region) {
   }
 }
 
-async function findTwin(base, home, targetRegion) {
+async function findTwin(base, home, targetRegion, knownName) {
   if (home === targetRegion) return null;
 
-  let sourceName;
-  try {
-    const data = await fetchCatalog(base, home);
-    sourceName = data?.name;
-  } catch {
-    return null;
+  let sourceName = knownName;
+  if (!sourceName) {
+    try {
+      const data = await fetchCatalog(base, home);
+      sourceName = data?.name;
+    } catch {
+      return null;
+    }
   }
   if (!sourceName) return null;
 
@@ -253,6 +279,18 @@ export async function cardFromRegion(base, region, extra = {}) {
 }
 
 export async function availability(base, sourceName, home, onRow) {
+  // One read of the home store, reused by every twin lookup below. Before this,
+  // each failing region re-fetched it, so a delisted avatar cost a dozen
+  // identical requests.
+  let name = sourceName;
+  if (!name) {
+    try {
+      name = (await fetchCatalog(base, home))?.name || null;
+    } catch {
+      name = null;
+    }
+  }
+
   const queue = REGIONS.map((r) => r.code);
   const worker = async () => {
     while (queue.length) {
@@ -271,8 +309,8 @@ export async function availability(base, sourceName, home, onRow) {
         continue;
       } catch { /* fall through to a name match */ }
 
-      if (sourceName && code !== home) {
-        const twin = await findTwin(base, home, code);
+      if (name && code !== home) {
+        const twin = await findTwin(base, home, code, name);
         if (twin) {
           try {
             const data = await fetchCatalog(twin.sku, code);
