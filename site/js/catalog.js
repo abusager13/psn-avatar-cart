@@ -332,6 +332,17 @@ async function findTwin(base, home, targetRegion, knownName) {
 }
 
 /** Probe every region for this product, streaming rows back as they land. */
+/**
+ * Warm the cache for a SKU the user is about to resolve. One request at most,
+ * only for the store they have selected, and only when the input already looks
+ * like a real product ID.
+ */
+export function prefetch(sku, region) {
+  const base = core.stripVariant(sku).value;
+  if (!base || !core.isContentId(sku)) return;
+  fetchCatalog(base, region).catch(() => {});
+}
+
 /** Build a card for a SKU from a store that does sell it. */
 export async function cardFromRegion(base, region, extra = {}) {
   const data = await fetchCatalog(base, region);

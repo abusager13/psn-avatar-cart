@@ -53,6 +53,10 @@ zero requests. The site backs off on `429`/`503` using `Retry-After` with jitter
 of retrying into the limit, caps the availability scan at four parallel workers, and
 staggers them so the fourteen probes don't travel in lockstep.
 
+One speculative request is allowed: when the input already looks like a product ID and
+the user pauses for 600 ms, the selected store's record is fetched so Resolve draws from
+cache (85 ms to card instead of 277 ms). It never prefetches the fourteen-store scan.
+
 ## No backend
 
 Sony's legacy catalog endpoint sends `Access-Control-Allow-Origin: *`, so the browser queries it

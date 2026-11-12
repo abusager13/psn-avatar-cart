@@ -4,7 +4,7 @@ import { core, ERR } from './core.js';
 import { randomSku } from './example.js';
 import {
   REGIONS, LookupError, isRegion, loadIndex, resolveInput, availability, cardFromRegion,
-  fetchItem as catalogFetchItem,
+  prefetch, fetchItem as catalogFetchItem,
 } from './catalog.js';
 import {
   renderChips, renderMessage, renderEmpty, renderCard, renderRegionRows,
@@ -362,6 +362,24 @@ function pickRegion(code) {
     syncUrl();
   }
 }
+
+// Speculative warmth: once the input looks like a real ID and the user pauses,
+// fetch that one store record so Resolve draws from cache. Debounced, single
+// request, and skipped when offline.
+let prefetchTimer;
+el.input.addEventListener('input', () => {
+  clearTimeout(prefetchTimer);
+  prefetchTimer = setTimeout(() => {
+    if (navigator.onLine === false) return;
+    const value = core.normalizeInput(el.input.value).value || '';
+    if (!value || state.busy) return;
+    if (/^[0-9A-F]{40}$/.test(value)) {
+      ensureIndex().catch(() => {});
+      return;
+    }
+    if (core.isContentId(value)) prefetch(value, state.region);
+  }, 600);
+});
 
 el.go.addEventListener('click', () => {
   syncUrl();
