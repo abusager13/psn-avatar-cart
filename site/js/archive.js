@@ -61,19 +61,16 @@ function renderCount() {
 
 function card(row) {
   const article = document.createElement('article');
-  article.className = 'card border border-white/5 bg-base-200 transition hover:border-white/15';
+  article.className = 'card border border-white/5 border-l-2 border-l-error/40 bg-base-200 transition hover:border-white/15 hover:border-l-error/70';
   article.innerHTML = `
     <div class="card-body gap-2 p-4">
-      <p class="flex items-center justify-between gap-2 text-[11px] uppercase tracking-wider text-base-content/45">
-        <span class="truncate">${esc(row.game || 'unknown game')}</span>
-        <span class="badge badge-error badge-xs shrink-0">delisted</span>
-      </p>
-      <h3 class="line-clamp-2 min-h-[2.4rem] text-sm font-semibold leading-snug">${esc(row.name || '(no avatar name recorded)')}</h3>
+      <p class="truncate text-[10px] uppercase tracking-wider text-base-content/35">${esc(row.game || 'unknown game')}</p>
+      <h3 class="line-clamp-2 min-h-[2.4rem] text-sm font-semibold leading-snug">${esc(row.name || '(no name recorded)')}</h3>
       <code class="truncate font-mono text-[10px] text-base-content/40">${esc(row.sku)}</code>
-      <code class="truncate font-mono text-[10px] text-base-content/25">${esc(row.hash)}</code>
+      <code class="truncate font-mono text-[10px] text-base-content/20">${esc(row.hash)}</code>
       <div class="mt-1 flex gap-2">
-        <a class="btn btn-primary btn-xs flex-1" href="./?hash=${esc(row.hash)}">Open ↗</a>
-        <button class="btn btn-ghost btn-xs" type="button">Copy hash</button>
+        <a class="btn btn-ghost btn-sm flex-1 border border-white/10 text-base-content/80 hover:border-white/25" href="./?hash=${esc(row.hash)}">Open ↗</a>
+        <button class="btn btn-ghost btn-sm" type="button">Copy hash</button>
       </div>
     </div>`;
   article.querySelector('button').addEventListener('click', async (event) => {
