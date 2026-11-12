@@ -1,6 +1,6 @@
 // Wiring: state, events, URL permalinks, recent lookups.
 
-import { initCore, core, ERR } from './wasm.js';
+import { core, ERR } from './core.js';
 import {
   REGIONS, LookupError, isRegion, loadIndex, resolveInput, availability, cardFromRegion,
   fetchItem as catalogFetchItem,
@@ -404,13 +404,6 @@ async function boot() {
   }, 1000);
   renderEmpty(el.card);
   paintRecent();
-
-  try {
-    await initCore('wasm/psn_core.wasm?v=__V__');
-  } catch (error) {
-    renderMessage(el.message, `The Rust/WASM core failed to load (${error.message}).`, 'error');
-    return;
-  }
 
   const params = new URLSearchParams(location.search);
   const region = (params.get('region') || '').toUpperCase();

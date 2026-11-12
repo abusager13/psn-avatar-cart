@@ -24,20 +24,21 @@ Static site. No install, no login, no backend.
 ## Architecture
 
 ```
-core/     Rust crate: SKU rules, EDAT header parsing, index lookup, name matching
-          → 55 KB WebAssembly module, no wasm-bindgen
 site/     the product: HTML, CSS, ES modules, data/
+  js/core.js    SKU rules, EDAT header parsing, index lookup, name matching
+  js/*.js       network, rendering, page wiring
+tools/    data pipeline: crawl.mjs, build-data.mjs, edat-scan.mjs
 docs/     screenshots
-.github/  Pages deploy (builds the core, then publishes site/)
+.github/  Pages deploy (publishes site/ as-is)
 ```
 
+No build step and no binary — it is static files served straight from Pages:
+
 ```bash
-rustup target add wasm32-unknown-unknown
-./core/build.sh                      # → site/wasm/psn_core.wasm
 python3 -m http.server -d site 8731
 ```
 
-Pushing to `main` builds the core and publishes `site/` to Pages.
+Pushing to `main` publishes `site/` to Pages.
 
 ## Data
 

@@ -1,6 +1,6 @@
-// Network + orchestration. All string/byte rules live in the Rust core.
+// Network + orchestration. String/byte rules live in core.js.
 
-import { core, ERR } from './wasm.js';
+import { core, ERR } from './core.js';
 
 export const CLIENT_ID = '2eb25762-877f-4140-b341-7c7e14c19f98';
 const CATALOG = 'https://store.playstation.com/store/api/chihiro/00_09_000/container';

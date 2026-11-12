@@ -1,6 +1,6 @@
 // Live search: ask Sony's own search for avatars matching a name.
 
-import { initCore, core } from './wasm.js';
+import { core } from './core.js';
 import { REGIONS } from './catalog.js';
 
 const SEARCH = 'https://commerce1.api.np.km.playstation.net/store/api/chihiro/00_09_000/search';
@@ -184,7 +184,6 @@ el.clear.addEventListener('click', () => {
 el.more.addEventListener('click', () => load(false));
 
 async function boot() {
-  await initCore('wasm/psn_core.wasm?v=__V__');
   const params = new URLSearchParams(location.search);
   if (params.get('region')) state.region = params.get('region').toUpperCase();
   if (params.get('q')) {

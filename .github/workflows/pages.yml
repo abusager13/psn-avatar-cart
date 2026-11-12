@@ -26,15 +26,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build the Rust core to WebAssembly
-        run: |
-          rustup target add wasm32-unknown-unknown
-          ./core/build.sh
-
       - name: Stamp asset versions with the commit SHA
         run: |
           V="${GITHUB_SHA::12}"
-          sed -i "s/__V__/${V}/g" site/index.html site/catalog.html site/js/*.js
+          sed -i "s/__V__/${V}/g" site/index.html site/catalog.html site/search.html site/archive.html site/js/*.js
           grep -c "__V__" site/index.html site/js/main.js || true
 
       - uses: actions/configure-pages@v5

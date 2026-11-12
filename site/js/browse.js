@@ -1,7 +1,7 @@
 // Catalogue browser: search the merged catalogue. Text only — the artwork lives
 // on the main lookup, where one item is resolved rather than hundreds listed.
 
-import { initCore, core } from './wasm.js';
+import { core } from './core.js';
 import { REGIONS } from './catalog.js';
 
 const CATALOG_URL = 'data/browse-catalog.tsv?v=__V__';
@@ -153,12 +153,6 @@ el.clear.addEventListener('click', () => {
 el.more.addEventListener('click', renderPage);
 
 async function boot() {
-  try {
-    await initCore('wasm/psn_core.wasm?v=__V__');
-  } catch (error) {
-    el.lede.textContent = `The Rust/WASM core failed to load (${error.message}).`;
-    return;
-  }
   try {
     state.rows = await loadCatalog();
   } catch (error) {
