@@ -95,7 +95,7 @@ export function renderCard(card, data, note, handlers) {
   });
 }
 
-/** Live countdown for the selected store: four stat cells plus a progress bar. */
+/** Live countdown: a ring for elapsed time plus one readable line of digits. */
 export function renderCountdown(node, code, now = Date.now()) {
   if (!node) return;
   const info = closureFor(code);
@@ -108,29 +108,27 @@ export function renderCountdown(node, code, now = Date.now()) {
     if (el) el.textContent = value;
   };
 
+  const days = Math.max(0, Math.floor(left / DAY));
+  const h = Math.max(0, Math.floor((left % DAY) / 3600000));
+  const m = Math.max(0, Math.floor((left % 3600000) / 60000));
+  const sec = Math.max(0, Math.floor((left % 60000) / 1000));
+
   set('.cd-text', `${left > 0 ? 'closes' : 'closed'} ${info.label} · ${code}`);
+  // The ring already carries the days, so the line shows the smaller units.
+  set('.cd-clock', left > 0
+    ? `${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(sec).padStart(2, '0')}s remaining`
+    : 'the store has closed');
+  set('.cd-days', String(days));
   set('.cd-note', info.note);
   node.classList.toggle('closed', left <= 0);
 
-  if (left <= 0) {
-    set('.cd-days', '0');
-    set('.cd-hours', '00');
-    set('.cd-mins', '00');
-    set('.cd-secs', '00');
-  } else {
-    const days = Math.floor(left / DAY);
-    set('.cd-days', String(days));
-    set('.cd-hours', String(Math.floor((left % DAY) / 3600000)).padStart(2, '0'));
-    set('.cd-mins', String(Math.floor((left % 3600000) / 60000)).padStart(2, '0'));
-    set('.cd-secs', String(Math.floor((left % 60000) / 1000)).padStart(2, '0'));
-  }
-
-  const bar = node.querySelector('.cd-progress');
-  if (bar) {
+  const ring = node.querySelector('.cd-ring');
+  if (ring) {
     const span = target - since;
-    const done = ((now - since) / (span || 1)) * 100;
-    bar.value = Math.min(100, Math.max(0, done));
-    bar.classList.toggle('progress-error', left <= 0);
+    const done = span > 0 ? ((now - since) / span) * 100 : 100;
+    ring.style.setProperty('--value', String(Math.min(100, Math.max(0, done))));
+    ring.classList.toggle('text-error', left <= 0);
+    ring.classList.toggle('text-primary', left > 0);
   }
 }
 
