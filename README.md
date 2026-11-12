@@ -44,18 +44,6 @@ python3 -m http.server -d site 8731
 
 Pushing to `main` builds the CSS and publishes `site/` to Pages.
 
-## Data
-
-<!-- data:start -->
-| File | Contents |
-|---|---|
-| `avatar-sku-index.tsv` | 5,350 hashes → SKUs, read out of `.edat` headers |
-| `all-skus.txt` | 32,513 unique SKUs — the master list |
-| `live-catalog.tsv` | 107,884 listings across 14 stores, 30,605 distinct SKUs, 27,166 absent from the archive |
-| `archive.tsv` | 1,803 hashes that resolve but are sold in no store |
-| `avatar-names.tsv` | 1,263 display names, 853 of them new to the archive |
-<!-- data:end -->
-
 ## No backend
 
 Sony's legacy catalog endpoint sends `Access-Control-Allow-Origin: *`, so the browser queries it
