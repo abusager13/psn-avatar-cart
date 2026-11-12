@@ -24,6 +24,7 @@ const state = {
   shown: 0,
   seen: new Set(),
   busy: false,
+  queued: false,
   seq: 0,
 };
 
@@ -102,7 +103,12 @@ async function load(reset) {
     }
     return;
   }
-  if (state.busy) return;
+  // A request already running used to swallow this one, so typing while results
+  // were loading left the old results on screen for the new query.
+  if (state.busy) {
+    state.queued = true;
+    return;
+  }
 
   state.busy = true;
   const seq = reset ? ++state.seq : state.seq;
@@ -138,7 +144,11 @@ async function load(reset) {
   } catch (error) {
     if (seq === state.seq) el.status.textContent = `Search failed: ${error.message}`;
   } finally {
-    if (seq === state.seq) state.busy = false;
+    state.busy = false;
+    if (state.queued) {
+      state.queued = false;
+      load(true);
+    }
   }
 }
 

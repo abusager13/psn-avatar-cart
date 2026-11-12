@@ -215,9 +215,10 @@ async function findTwin(base, home, targetRegion) {
   if (!wanted) return null;
 
   let payload;
+  const lang = REGION_LANG[targetRegion] || 'en';
   try {
     const response = await fetch(
-      `${SEARCH}/${targetRegion}/en/19/${encodeURIComponent(sourceName)}?platform=ps3`
+      `${SEARCH}/${targetRegion}/${lang}/19/${encodeURIComponent(sourceName)}?platform=ps3`
     );
     if (!response.ok) return null;
     payload = await response.json();

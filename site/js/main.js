@@ -40,6 +40,7 @@ const state = {
   card: null,
   rows: [],
   busy: false,
+  queued: null,
   indexReady: false,
   indexPromise: null,
   recent: readRecent(),
@@ -173,7 +174,13 @@ function regionHunt(base, home, sourceName) {
 
 async function run(rawInput, region) {
   const value = String(rawInput || '').trim();
-  if (!value || state.busy) return;
+  if (!value) return;
+  // A click while a lookup is running used to be discarded; keep the latest one
+  // and start it as soon as the current attempt finishes.
+  if (state.busy) {
+    state.queued = { value, region };
+    return;
+  }
 
   state.busy = true;
   state.card = null;
@@ -251,6 +258,11 @@ async function run(rawInput, region) {
   } finally {
     state.busy = false;
     el.go.disabled = false;
+    if (state.queued) {
+      const next = state.queued;
+      state.queued = null;
+      run(next.value, next.region);
+    }
   }
 }
 
@@ -262,7 +274,12 @@ async function fetchItem(base, region) {
   }
 }
 
+// Every lookup owns a token; a scan from an older lookup must not repaint the
+// table belonging to a newer one.
+let availabilityRun = 0;
+
 function startAvailability(card, rawInput, region) {
+  const runId = ++availabilityRun;
   const base = core.stripVariant(card.baseSku).value;
   const home = core.homeRegion(base).value;
 
@@ -272,6 +289,7 @@ function startAvailability(card, rawInput, region) {
   renderRegionRows(el.regionsBody, state.rows, REGION_NAMES);
 
   const update = (row) => {
+    if (runId !== availabilityRun) return;
     const index = state.rows.findIndex((r) => r.region === row.region);
     if (index >= 0) state.rows[index] = { ...state.rows[index], ...row };
     renderRegionRows(el.regionsBody, state.rows, REGION_NAMES);
@@ -281,7 +299,7 @@ function startAvailability(card, rawInput, region) {
   };
 
   availability(base, card.name, home, update).catch(() => {
-    el.regionsSummary.textContent = 'availability check failed';
+    if (runId === availabilityRun) el.regionsSummary.textContent = 'availability check failed';
   });
 }
 
@@ -308,9 +326,16 @@ async function copyText(text) {
     return true;
   } catch {
     try {
-      el.input.value = text;
-      el.input.select();
-      return document.execCommand('copy');
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.top = '-1000px';
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand('copy');
+      area.remove();
+      return ok;
     } catch {
       return false;
     }
@@ -399,10 +424,10 @@ if (example) {
 async function boot() {
   renderChips(el.chips, REGIONS, state.region, pickRegion);
   renderCountdown(el.countdown, state.region);
+  setInterval(() => renderCountdown(el.countdown, state.region), 1000);
   setInterval(() => {
-    renderCountdown(el.countdown, state.region);
     if (state.rows.length) renderRegionRows(el.regionsBody, state.rows, REGION_NAMES);
-  }, 1000);
+  }, 60000);
   renderEmpty(el.card);
   paintRecent();
 

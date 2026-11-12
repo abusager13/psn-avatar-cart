@@ -69,7 +69,7 @@ function stripVariant(sku) {
 function homeRegion(sku) {
   const s = String(sku ?? '').toUpperCase();
   const prefix = s.slice(0, 2);
-  if (prefix === 'EP') return ok('GB');
+  if (prefix === 'EP' || prefix === 'ET') return ok('GB');   // ET = European trial
   if (prefix === 'JP') return ok('JP');
   if (prefix === 'HP') return ok('HK');
   return ok('US');
@@ -82,7 +82,9 @@ function normName(name) {
   let space = false;
   for (const ch of text) {
     if (ch === '\u00ae' || ch === '\u2122' || ch === '\u00a9') continue;
-    if (/[a-z0-9]/.test(ch)) {
+    // Keep letters in any script: Japanese titles must survive normalisation or
+    // regional twin matching can never find them.
+    if (/[\p{L}\p{N}]/u.test(ch)) {
       out += ch;
       space = false;
     } else if (!space && out.length) {
@@ -106,7 +108,9 @@ function namesMatch(a, b) {
  * is a typo or junk, and sending it upstream only produces noise.
  */
 export function isContentId(value) {
-  return /^[A-Z]{2}\d{4}-[A-Z0-9]{4,}_\d{2}-[A-Z0-9]+$/.test(String(value ?? '').trim());
+  // Base ID, optionally followed by the 4-character variant Sony returns as
+  // `default_sku.id` (-U099, -E001). Anything else is rejected.
+  return /^[A-Z]{2}\d{4}-[A-Z0-9]{4,}_\d{2}-[A-Z0-9]+(-[A-Z0-9]{4})?$/.test(String(value ?? '').trim());
 }
 
 /** The cart deep-link Sony's own store uses. */

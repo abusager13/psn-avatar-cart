@@ -22,8 +22,6 @@ import { existsSync } from 'node:fs';
 
 const D = 'site/data/';
 const CHECK = process.argv.includes('--check');
-const MARK_START = '<!-- data:start -->';
-const MARK_END = '<!-- data:end -->';
 
 const read = async (file) => (existsSync(file) ? readFile(file, 'utf8') : '');
 
@@ -102,18 +100,6 @@ function build({ live, index, names }) {
   return { files, stats };
 }
 
-function readmeTable(s) {
-  return `${MARK_START}
-| File | Contents |
-|---|---|
-| \`avatar-sku-index.tsv\` | ${s.hashes.toLocaleString('en-US')} hashes → SKUs, read out of \`.edat\` headers |
-| \`all-skus.txt\` | ${s.allSkus.toLocaleString('en-US')} unique SKUs — the master list |
-| \`live-catalog.tsv\` | ${s.listings.toLocaleString('en-US')} listings across ${s.stores} stores, ${s.liveSkus.toLocaleString('en-US')} distinct SKUs, ${s.beyondArchive.toLocaleString('en-US')} absent from the archive |
-| \`archive.tsv\` | ${s.delisted.toLocaleString('en-US')} hashes that resolve but are sold in no store |
-| \`avatar-names.tsv\` | ${s.named.toLocaleString('en-US')} display names, ${s.namedNew.toLocaleString('en-US')} of them new to the archive |
-${MARK_END}`;
-}
-
 async function main() {
   const data = await load();
   const { files, stats } = build(data);
@@ -125,19 +111,6 @@ async function main() {
       stale += 1;
       if (!CHECK) await writeFile(path, content);
     }
-  }
-
-  const readme = await read('README.md');
-  const start = readme.indexOf(MARK_START);
-  const end = readme.indexOf(MARK_END);
-  const table = readmeTable(stats);
-  let nextReadme = readme;
-  if (start >= 0 && end > start) {
-    nextReadme = readme.slice(0, start) + table + readme.slice(end + MARK_END.length);
-  }
-  if (nextReadme !== readme) {
-    stale += 1;
-    if (!CHECK) await writeFile('README.md', nextReadme);
   }
 
   if (CHECK) {
