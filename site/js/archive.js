@@ -61,18 +61,20 @@ function renderCount() {
 
 function card(row) {
   const article = document.createElement('article');
-  article.className = 'av';
-  const badge = '<span class="badge gone">delisted</span>';
+  article.className = 'card border border-white/5 bg-base-200 transition hover:border-white/15';
   article.innerHTML = `
-    <div class="av-body">
-      <p class="av-meta"><span class="av-region">${esc(row.game || 'unknown game')}</span>${badge}</p>
-      <h3 class="av-name">${esc(row.name || '(no avatar name recorded)')}</h3>
-      <code class="av-sku">${esc(row.sku)}</code>
-      <code class="av-sku hash">${esc(row.hash)}</code>
-    </div>
-    <div class="av-actions">
-      <a class="btn primary small" href="./?hash=${esc(row.hash)}" >Open ↗</a>
-      <button class="btn ghost small" type="button">Copy hash</button>
+    <div class="card-body gap-2 p-4">
+      <p class="flex items-center justify-between gap-2 text-[11px] uppercase tracking-wider text-base-content/45">
+        <span class="truncate">${esc(row.game || 'unknown game')}</span>
+        <span class="badge badge-error badge-xs shrink-0">delisted</span>
+      </p>
+      <h3 class="line-clamp-2 min-h-[2.4rem] text-sm font-semibold leading-snug">${esc(row.name || '(no avatar name recorded)')}</h3>
+      <code class="truncate font-mono text-[10px] text-base-content/40">${esc(row.sku)}</code>
+      <code class="truncate font-mono text-[10px] text-base-content/25">${esc(row.hash)}</code>
+      <div class="mt-1 flex gap-2">
+        <a class="btn btn-primary btn-xs flex-1" href="./?hash=${esc(row.hash)}">Open ↗</a>
+        <button class="btn btn-ghost btn-xs" type="button">Copy hash</button>
+      </div>
     </div>`;
   article.querySelector('button').addEventListener('click', async (event) => {
     const button = event.currentTarget;
@@ -109,7 +111,7 @@ function renderFilters() {
   for (const f of FILTERS) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = `chip${state.filter === f.id ? ' active' : ''}`;
+    b.className = `btn btn-xs ${state.filter === f.id ? 'btn-primary' : 'btn-ghost'}`;
     b.textContent = f.label;
     b.addEventListener('click', () => {
       state.filter = f.id;

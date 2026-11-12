@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="psn">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,54 +11,63 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
   </head>
-  <body>
-    <main id="app">
-      <nav class="topbar" aria-label="Sections">
-        <a class="tab active" href="./">Home</a>
-        <a class="tab" href="search.html">Search</a>
-        <a class="tab" href="catalog.html">Catalogue</a>
-        <a class="tab" href="archive.html">Delisted</a>
-        <a class="gh" href="https://github.com/abusager13/psn-avatar-cart" target="_blank" rel="noopener noreferrer"
-           aria-label="Source code on GitHub" title="Source on GitHub">
-          <svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" focusable="false">
-          <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
-            0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01
-            1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95
-            0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0
-            1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15
-            0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38
-            A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
-        </svg>
-        </a>
-      </nav>
-
-      <header class="hero">
-        <h1>PS3 Avatars</h1>
-        <p class="tagline">
-          A PSNA hash, a SKU, or an <code>.edat</code> file in. A live price, the regions that still
-          sell it, and a working PlayStation Store cart link out.
-        </p>
-        <p class="hero-note">
-          No install, no login, no account to create <em>here</em>. But the cart link opens Sony's own
-          checkout, so
-          <strong class="flash-signin">sign in to your PlayStation account in this browser first</strong> —
-          otherwise your cart will show nothing.
-        </p>
-      </header>
-
-      <section class="tool" aria-label="Lookup">
-        <div id="chips" class="chips" role="group" aria-label="Store region"></div>
-
-      <div id="countdown" class="countdown" role="timer" aria-live="off">
-        <span class="cd-dot" aria-hidden="true"></span>
-        <span class="cd-text"></span>
-        <span class="cd-clock"></span>
-        <span class="cd-note"></span>
+  <body class="min-h-dvh bg-base-100 font-sans text-base-content antialiased">
+    <header class="sticky top-0 z-30 border-b border-white/5 bg-black/75 backdrop-blur">
+      <div class="mx-auto flex max-w-5xl items-center gap-3 px-4 py-2.5">
+        <a href="./" class="font-display text-base tracking-wide">PS3 Avatars</a>
+        <nav class="ml-auto flex items-center gap-1" aria-label="Sections">
+          <a class="btn btn-ghost btn-sm btn-active" href="./">Home</a>
+          <a class="btn btn-ghost btn-sm" href="search.html">Search</a>
+          <a class="btn btn-ghost btn-sm" href="catalog.html">Catalogue</a>
+          <a class="btn btn-ghost btn-sm" href="archive.html">Delisted</a>
+          <a class="btn btn-ghost btn-sm btn-circle" href="https://github.com/abusager13/psn-avatar-cart"
+             target="_blank" rel="noopener noreferrer" aria-label="Source code on GitHub" title="Source on GitHub">
+            <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" focusable="false">
+              <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+                0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01
+                1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95
+                0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0
+                1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15
+                0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38
+                A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+            </svg>
+          </a>
+        </nav>
       </div>
+    </header>
 
-        <div class="row">
-          <label class="field">
-            <span class="sr-only">PSNA hash or SKU</span>
+    <main id="app" class="mx-auto flex max-w-5xl flex-col gap-6 px-4 pb-16 pt-8">
+      <section class="flex flex-col gap-3">
+        <h1 class="font-display text-4xl leading-none md:text-5xl">PS3 Avatars</h1>
+        <p class="max-w-2xl text-base leading-relaxed text-base-content/70">
+          A PSNA hash, a SKU, or an <code class="rounded bg-base-300 px-1.5 py-0.5 font-mono text-[0.85em]">.edat</code>
+          file in. A live price, the regions that still sell it, and a working PlayStation Store cart link out.
+        </p>
+        <div class="flex max-w-3xl items-start gap-2 rounded-box border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm text-base-content/75" role="note">
+          <svg class="mt-1 h-4 w-4 shrink-0 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>
+            No install, no login, no account to create <em>here</em>. But the cart link opens Sony's own
+            checkout, so
+            <strong class="flash-signin">sign in to your PlayStation account in this browser first</strong>
+            — otherwise your cart will show nothing.
+          </span>
+        </div>
+      </section>
+
+      <section class="card border border-white/5 bg-base-200 shadow-xl" aria-label="Lookup">
+        <div class="card-body gap-4">
+          <div id="chips" class="flex flex-wrap gap-1" role="group" aria-label="Store region"></div>
+
+          <div id="countdown" class="flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-box border border-white/5 bg-base-300/40 px-4 py-3" role="timer" aria-live="off">
+            <span class="cd-dot h-2 w-2 rounded-full bg-warning" aria-hidden="true"></span>
+            <span class="cd-text text-[11px] uppercase tracking-wider text-base-content/60"></span>
+            <span class="cd-clock counter-digits text-2xl font-semibold text-base-content"></span>
+            <span class="cd-note text-[11px] text-base-content/50"></span>
+          </div>
+
+          <div class="flex flex-col gap-2 sm:flex-row">
             <input
               id="input"
               type="text"
@@ -66,68 +75,71 @@
               autocomplete="off"
               autocapitalize="characters"
               placeholder="PSNA hash or SKU…"
+              class="input input-bordered w-full font-mono text-sm"
             />
-          </label>
-          <button id="paste" class="btn ghost" type="button" title="Read from clipboard">Paste</button>
-          <button id="edat" class="btn ghost" type="button" title="Read a PSNA .edat file">Open .edat…</button>
-          <button id="go" class="btn primary" type="button">Resolve</button>
-          <input id="file" type="file" accept=".edat" hidden />
-        </div>
-
-        <div id="message" class="message hidden" role="status" aria-live="polite"></div>
-
-        <article id="card" class="card empty" aria-live="polite">
-          <div class="empty-inner">
-            <strong>Nothing resolved yet</strong>
-            <span>
-              Pick your store region, then paste a PSNA hash or SKU — or open a <code>.edat</code> file.
-              Try <button class="linky" id="example" type="button">an example</button>.
-            </span>
+            <div class="flex gap-2">
+              <button id="paste" class="btn btn-ghost flex-1 sm:flex-none" type="button" title="Read from clipboard">Paste</button>
+              <button id="edat" class="btn btn-ghost flex-1 sm:flex-none" type="button" title="Read a PSNA .edat file">Open .edat…</button>
+              <button id="go" class="btn btn-primary flex-1 sm:flex-none" type="button">Resolve</button>
+            </div>
+            <input id="file" type="file" accept=".edat" hidden />
           </div>
-        </article>
 
-        <div id="permalink" class="permalink hidden">
-          <span class="permalink-label">Shareable link</span>
-          <code id="permalink-url"></code>
-          <button id="permalink-copy" class="btn tiny ghost" type="button">Copy</button>
+          <div id="message" class="hidden" role="status" aria-live="polite"></div>
+
+          <article id="card" class="rounded-box border border-dashed border-white/10 bg-base-300/30" aria-live="polite">
+            <div class="flex flex-col gap-1 p-6">
+              <strong class="text-sm">Nothing resolved yet</strong>
+              <span class="text-sm text-base-content/60">
+                Pick your store region, then paste a PSNA hash or SKU — or open a <code class="rounded bg-base-300 px-1 py-0.5 font-mono text-[0.85em]">.edat</code> file.
+                Try <button class="link link-primary link-hover" id="example" type="button">an example</button>.
+              </span>
+            </div>
+          </article>
+
+          <div id="permalink" class="hidden flex-wrap items-center gap-2 rounded-box border border-white/5 bg-base-300/40 px-3 py-2">
+            <span class="text-[10px] uppercase tracking-wider text-base-content/50">Shareable link</span>
+            <code id="permalink-url" class="font-mono text-xs text-base-content/70"></code>
+            <button id="permalink-copy" class="btn btn-ghost btn-xs ml-auto" type="button">Copy</button>
+          </div>
         </div>
       </section>
 
-      <section id="regions" class="regions hidden" aria-label="Regional availability">
-        <div class="section-head">
-          <h2>Where it's still sold</h2>
-          <span id="regions-summary" class="section-note"></span>
+      <section id="regions" class="hidden flex-col gap-3" aria-label="Regional availability">
+        <div class="flex items-baseline justify-between gap-3">
+          <h2 class="font-display text-2xl">Where it's still sold</h2>
+          <span id="regions-summary" class="text-xs text-base-content/50"></span>
         </div>
-        <div class="table-wrap">
-          <table>
+        <div class="overflow-x-auto rounded-box border border-white/5">
+          <table class="table table-sm">
             <thead>
               <tr><th>Region</th><th>Status</th><th>Price</th><th></th></tr>
             </thead>
             <tbody id="regions-body"></tbody>
           </table>
         </div>
-        <p class="table-note">
+        <p class="text-xs leading-relaxed text-base-content/50">
           Prices are in each store's own currency, so they aren't directly comparable.
-          <span class="dot twin"></span> marks a match found by name — the same artwork sold under a
-          different product ID in that region.
+          <span class="badge badge-warning badge-xs align-middle"></span> marks a match found by name — the
+          same artwork sold under a different product ID in that region.
         </p>
       </section>
 
-      <section id="recent-section" class="recent hidden" aria-label="Recent lookups">
-        <div class="section-head">
-          <h2>Recent</h2>
-          <button id="recent-clear" class="btn tiny ghost" type="button">Clear</button>
+      <section id="recent-section" class="hidden flex-col gap-3" aria-label="Recent lookups">
+        <div class="flex items-baseline justify-between">
+          <h2 class="font-display text-2xl">Recent</h2>
+          <button id="recent-clear" class="btn btn-ghost btn-xs" type="button">Clear</button>
         </div>
-        <div id="recent" class="recent-list"></div>
+        <div id="recent" class="grid grid-cols-1 gap-2 sm:grid-cols-2"></div>
       </section>
 
-      <footer class="foot">
+      <footer class="flex flex-col gap-2 border-t border-white/5 pt-6 text-xs leading-relaxed text-base-content/45">
         <p>
-          Uses Sony's public catalog API — the same one the store front-end calls. Artwork is loaded
-          from Sony's CDN at runtime and never stored here. The site keeps your recent lookups in this
-          browser only; nothing is sent to a server we control, because there isn't one.
+          Uses Sony's public catalog API — the same one the store front-end calls. Artwork is loaded from
+          Sony's CDN at runtime and never stored here. The site keeps your recent lookups in this browser
+          only; nothing is sent to a server we control, because there isn't one.
         </p>
-        <p class="tiny">
+        <p>
           Unofficial fan tool. Not affiliated with, endorsed by, or sponsored by Sony Interactive
           Entertainment. PlayStation and PSN are trademarks of Sony Interactive Entertainment LLC.
         </p>

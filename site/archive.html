@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="psn">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,57 +8,52 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
   </head>
-  <body>
-    <main id="app" class="wide">
-      <nav class="topbar" aria-label="Sections">
-        <a class="tab" href="./">Home</a>
-        <a class="tab" href="search.html">Search</a>
-        <a class="tab" href="catalog.html">Catalogue</a>
-        <a class="tab active" href="archive.html">Delisted</a>
-        <a class="gh" href="https://github.com/abusager13/psn-avatar-cart" target="_blank" rel="noopener noreferrer"
-           aria-label="Source code on GitHub" title="Source on GitHub">
-          <svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" focusable="false">
-          <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
-            0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01
-            1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95
-            0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0
-            1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15
-            0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38
-            A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
-        </svg>
-        </a>
-      </nav>
+  <body class="min-h-dvh bg-base-100 font-sans text-base-content antialiased">
+    <header class="sticky top-0 z-30 border-b border-white/5 bg-black/75 backdrop-blur">
+      <div class="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5">
+        <a href="./" class="font-display text-base tracking-wide">PS3 Avatars</a>
+        <nav class="ml-auto flex items-center gap-1" aria-label="Sections">
+          <a class="btn btn-ghost btn-sm" href="./">Home</a>
+          <a class="btn btn-ghost btn-sm" href="search.html">Search</a>
+          <a class="btn btn-ghost btn-sm" href="catalog.html">Catalogue</a>
+          <a class="btn btn-ghost btn-sm btn-active" href="archive.html">Delisted</a>
+          <a class="btn btn-ghost btn-sm btn-circle" href="https://github.com/abusager13/psn-avatar-cart" target="_blank" rel="noopener noreferrer" aria-label="Source code on GitHub">
+            <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          </a>
+        </nav>
+      </div>
+    </header>
 
-      <header class="hero">
-        <h1>Delisted</h1>
-        <p class="tagline" id="lede">Loading…</p>
-      </header>
-
-      <section class="tool">
-        <div class="row">
-          <label class="field">
-            <span class="sr-only">Search by hash, game, name or SKU</span>
-            <input id="q" type="search" placeholder="Search by hash, game, avatar name or SKU…" autocomplete="off" spellcheck="false" />
-          </label>
-          <button id="clear" class="btn ghost" type="button">Clear</button>
-        </div>
-        <div id="filters" class="chips" role="group" aria-label="Filter"></div>
-        <p id="count" class="count"></p>
+    <main id="app" class="mx-auto flex max-w-6xl flex-col gap-5 px-4 pb-16 pt-8">
+      <section class="flex flex-col gap-2">
+        <h1 class="font-display text-4xl leading-none">Delisted</h1>
+        <p id="lede" class="text-sm text-base-content/65">Loading…</p>
       </section>
 
-      <section id="results" class="grid" aria-live="polite"></section>
+      <section class="card border border-white/5 bg-base-200 shadow-xl">
+        <div class="card-body gap-3">
+          <div class="flex flex-col gap-2 sm:flex-row">
+            <input id="q" type="search" placeholder="Search by hash, game, avatar name or SKU…" autocomplete="off" spellcheck="false"
+                   class="input input-bordered w-full text-sm" />
+            <button id="clear" class="btn btn-ghost" type="button">Clear</button>
+          </div>
+          <div id="filters" class="flex flex-wrap gap-1" role="group" aria-label="Filter"></div>
+          <p id="count" class="text-xs text-base-content/55"></p>
+        </div>
+      </section>
 
-      <div class="more-wrap">
-        <button id="more" class="btn ghost hidden" type="button">Load more</button>
+      <section id="results" class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3" aria-live="polite"></section>
+
+      <div class="flex justify-center">
+        <button id="more" class="btn btn-ghost hidden" type="button">Load more</button>
       </div>
 
-      <footer class="foot">
+      <footer class="flex flex-col gap-2 border-t border-white/5 pt-6 text-xs leading-relaxed text-base-content/45">
         <p>
-          Every row here is an avatar that is gone: we can identify it by its PSNA hash, but no
-          PlayStation store sells it any more. “Open” re-runs the check against all 14 stores in case
-          that status has changed.
+          Every row here is an avatar that is gone: we can identify it by its PSNA hash, but no PlayStation
+          store sells it any more. "Open" re-runs the check against all 14 stores in case that has changed.
         </p>
-        <p class="tiny">
+        <p>
           Unofficial fan tool. Not affiliated with, endorsed by, or sponsored by Sony Interactive
           Entertainment. Prices shown are per-region and not directly comparable.
         </p>

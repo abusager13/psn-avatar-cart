@@ -24,21 +24,25 @@ Static site. No install, no login, no backend.
 ## Architecture
 
 ```
-site/     the product: HTML, CSS, ES modules, data/
+site/     the product: HTML, ES modules, data/
   js/core.js    SKU rules, EDAT header parsing, index lookup, name matching
   js/*.js       network, rendering, page wiring
+  css/input.css Tailwind source (daisyUI theme lives in tailwind.config.js)
+  styles.css    build output — do not edit by hand
 tools/    data pipeline: crawl.mjs, build-data.mjs, edat-scan.mjs
 docs/     screenshots
-.github/  Pages deploy (publishes site/ as-is)
+.github/  Pages deploy (builds CSS, then publishes site/)
 ```
 
-No build step and no binary — it is static files served straight from Pages:
+UI is Tailwind + daisyUI on a black theme. Build the stylesheet, then serve:
 
 ```bash
+npm install
+npm run css                          # → site/styles.css
 python3 -m http.server -d site 8731
 ```
 
-Pushing to `main` publishes `site/` to Pages.
+Pushing to `main` builds the CSS and publishes `site/` to Pages.
 
 ## Data
 

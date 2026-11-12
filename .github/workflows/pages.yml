@@ -26,6 +26,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Build the stylesheet (Tailwind + daisyUI)
+        run: |
+          npm ci
+          npm run css
+
       - name: Stamp asset versions with the commit SHA
         run: |
           V="${GITHUB_SHA::12}"

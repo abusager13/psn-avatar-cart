@@ -1,0 +1,13 @@
+{
+  "name": "ps3-avatars",
+  "private": true,
+  "description": "PSNA hash / SKU / .edat to a PlayStation Store cart link",
+  "scripts": {
+    "css": "tailwindcss -i site/css/input.css -o site/styles.css --minify",
+    "css:watch": "tailwindcss -i site/css/input.css -o site/styles.css --watch"
+  },
+  "devDependencies": {
+    "daisyui": "^4.12.14",
+    "tailwindcss": "^3.4.14"
+  }
+}

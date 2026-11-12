@@ -64,19 +64,21 @@ function card(item) {
   const art = imageUrl(item);
 
   const article = document.createElement('article');
-  article.className = 'av';
+  article.className = 'card overflow-hidden border border-white/5 bg-base-200 transition hover:border-white/15';
   article.innerHTML = `
-    ${art ? `<img class="av-img" src="${esc(art)}" alt="" loading="lazy" referrerpolicy="no-referrer">`
-          : '<div class="av-img"></div>'}
-    <div class="av-body">
-      <h3 class="av-name">${esc(item.name || '(unnamed)')}</h3>
-      <p class="av-meta"><span class="av-region">${esc(platform)}</span>
-        <span class="av-price">${esc(price || '—')}</span></p>
-      <code class="av-sku">${esc(base)}</code>
-    </div>
-    <div class="av-actions">
-      <a class="btn primary small" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Add to cart ↗</a>
-      <button class="btn ghost small" type="button">Copy link</button>
+    ${art ? `<img class="card-avatar" src="${esc(art)}" alt="" loading="lazy" referrerpolicy="no-referrer">`
+          : '<div class="card-avatar"></div>'}
+    <div class="card-body gap-2 p-4">
+      <h3 class="line-clamp-2 min-h-[2.4rem] text-sm font-semibold leading-snug">${esc(item.name || '(unnamed)')}</h3>
+      <p class="flex items-center justify-between gap-2 text-[11px] text-base-content/45">
+        <span>${esc(platform)}</span>
+        <span class="font-mono text-base-content/75">${esc(price || '—')}</span>
+      </p>
+      <code class="truncate font-mono text-[10px] text-base-content/35">${esc(base)}</code>
+      <div class="mt-1 flex gap-2">
+        <a class="btn btn-primary btn-xs flex-1" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Add to cart ↗</a>
+        <button class="btn btn-ghost btn-xs" type="button">Copy link</button>
+      </div>
     </div>`;
   article.querySelector('button').addEventListener('click', async (event) => {
     const button = event.currentTarget;
@@ -145,7 +147,7 @@ function renderRegions() {
   for (const r of REGIONS) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = `chip${state.region === r.code ? ' active' : ''}`;
+    b.className = `btn btn-xs ${state.region === r.code ? 'btn-primary' : 'btn-ghost'}`;
     b.textContent = r.code;
     b.title = r.name;
     b.addEventListener('click', () => {
