@@ -1,6 +1,4 @@
 // Pure rules: input normalisation, SKU handling, EDAT parsing, index lookup.
-// Formerly a Rust crate compiled to WebAssembly; this is the same logic in JS,
-// so the site ships no binary and needs no build step.
 
 const CLIENT_ID = '2eb25762-877f-4140-b341-7c7e14c19f98';
 const CHECKOUT = 'https://checkout.playstation.com/add';
@@ -162,11 +160,6 @@ function lookup(hash) {
 }
 
 /* ---------------------------------------------------------------- api */
-
-// Kept as an async no-op so pages that awaited the old WASM loader keep working.
-export async function initCore() {
-  return core;
-}
 
 export const core = {
   ready: () => true,
