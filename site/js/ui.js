@@ -95,28 +95,43 @@ export function renderCard(card, data, note, handlers) {
   });
 }
 
-/** Live countdown for the selected store. */
+/** Live countdown for the selected store: four stat cells plus a progress bar. */
 export function renderCountdown(node, code, now = Date.now()) {
   if (!node) return;
   const info = closureFor(code);
-  const left = Date.parse(info.target) - now;
-  const text = node.querySelector('.cd-text');
-  const clock = node.querySelector('.cd-clock');
-  const note = node.querySelector('.cd-note');
+  const target = Date.parse(info.target);
+  const since = Date.parse(info.since || '2026-07-01T00:00:00Z');
+  const left = target - now;
 
-  text.textContent = `PS3 store ${left > 0 ? 'closes' : 'closed'} ${info.label} · ${code}`;
+  const set = (selector, value) => {
+    const el = node.querySelector(selector);
+    if (el) el.textContent = value;
+  };
+
+  set('.cd-text', `${left > 0 ? 'closes' : 'closed'} ${info.label} · ${code}`);
+  set('.cd-note', info.note);
   node.classList.toggle('closed', left <= 0);
 
   if (left <= 0) {
-    clock.textContent = 'closed';
+    set('.cd-days', '0');
+    set('.cd-hours', '00');
+    set('.cd-mins', '00');
+    set('.cd-secs', '00');
   } else {
     const days = Math.floor(left / DAY);
-    const h = Math.floor((left % DAY) / 3600000);
-    const m = Math.floor((left % 3600000) / 60000);
-    const sec = Math.floor((left % 60000) / 1000);
-    clock.textContent = `${days}d ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(sec).padStart(2, '0')}s`;
+    set('.cd-days', String(days));
+    set('.cd-hours', String(Math.floor((left % DAY) / 3600000)).padStart(2, '0'));
+    set('.cd-mins', String(Math.floor((left % 3600000) / 60000)).padStart(2, '0'));
+    set('.cd-secs', String(Math.floor((left % 60000) / 1000)).padStart(2, '0'));
   }
-  note.textContent = info.note;
+
+  const bar = node.querySelector('.cd-progress');
+  if (bar) {
+    const span = target - since;
+    const done = ((now - since) / (span || 1)) * 100;
+    bar.value = Math.min(100, Math.max(0, done));
+    bar.classList.toggle('progress-error', left <= 0);
+  }
 }
 
 export function renderRegionRows(tbody, rows, regionNames, now = Date.now()) {

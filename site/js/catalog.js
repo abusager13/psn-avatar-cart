@@ -31,12 +31,14 @@ const REGION_SET = new Set(REGIONS.map((r) => r.code));
 export const CLOSURE = {
   default: {
     target: '2027-07-01T00:00:00Z',
+    since: '2026-07-01T00:00:00Z',
     label: 'July 2027',
     exact: false,
     note: 'Sony announced “July 2027” without a day.',
   },
   TR: {
     target: '2026-12-31T00:00:00Z',
+    since: '2026-07-01T00:00:00Z',
     label: 'late 2026',
     exact: false,
     note: "Sony groups Türkiye with the Middle East, which closes late 2026. Unconfirmed.",

@@ -60,11 +60,31 @@
         <div class="card-body gap-4">
           <div id="chips" class="flex flex-wrap gap-1" role="group" aria-label="Store region"></div>
 
-          <div id="countdown" class="flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-box border border-white/5 bg-base-300/40 px-4 py-3" role="timer" aria-live="off">
-            <span class="cd-dot h-2 w-2 rounded-full bg-warning" aria-hidden="true"></span>
-            <span class="cd-text text-[11px] uppercase tracking-wider text-base-content/60"></span>
-            <span class="cd-clock counter-digits text-2xl font-semibold text-base-content"></span>
-            <span class="cd-note text-[11px] text-base-content/50"></span>
+          <div id="countdown" class="rounded-box border border-white/5 bg-base-200 p-4" role="timer" aria-live="off">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="badge badge-warning badge-sm font-semibold">PS3 store</span>
+              <span class="cd-text text-[11px] uppercase tracking-wider text-base-content/60"></span>
+              <span class="cd-note ml-auto text-[11px] leading-snug text-base-content/35"></span>
+            </div>
+            <div class="mt-3 grid grid-cols-4 gap-2">
+              <div class="rounded-lg bg-base-300/50 px-2 py-2 text-center">
+                <div class="cd-days counter-digits text-lg font-semibold leading-none"></div>
+                <div class="mt-1 text-[9px] uppercase tracking-widest text-base-content/40">days</div>
+              </div>
+              <div class="rounded-lg bg-base-300/50 px-2 py-2 text-center">
+                <div class="cd-hours counter-digits text-lg font-semibold leading-none"></div>
+                <div class="mt-1 text-[9px] uppercase tracking-widest text-base-content/40">hours</div>
+              </div>
+              <div class="rounded-lg bg-base-300/50 px-2 py-2 text-center">
+                <div class="cd-mins counter-digits text-lg font-semibold leading-none"></div>
+                <div class="mt-1 text-[9px] uppercase tracking-widest text-base-content/40">minutes</div>
+              </div>
+              <div class="rounded-lg bg-base-300/50 px-2 py-2 text-center">
+                <div class="cd-secs counter-digits text-lg font-semibold leading-none"></div>
+                <div class="mt-1 text-[9px] uppercase tracking-widest text-base-content/40">seconds</div>
+              </div>
+            </div>
+            <progress class="cd-progress progress progress-primary mt-3 h-1 w-full" value="0" max="100"></progress>
           </div>
 
           <div class="flex flex-col gap-2 sm:flex-row">
