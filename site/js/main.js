@@ -166,7 +166,9 @@ function messageFor(error, scanned) {
 function regionHunt(base, home, sourceName) {
   const found = [];
   return availability(base, sourceName, home, (row) => {
-    if (row.status === 'yes' || row.status === 'twin') found.push(row.region);
+    if (row.status === 'yes' || row.status === 'twin') {
+      found.push({ region: row.region, sku: row.sku || base });
+    }
   }).then(() => found);
 }
 
@@ -224,7 +226,8 @@ async function run(rawInput, region) {
         sourceName = data?.name || null;
       } catch { /* no name to match on */ }
       const found = await regionHunt(error.payload.base, home, sourceName);
-      let text = messageFor(error, found);
+      const foundRegions = found.map((f) => f.region);
+      let text = messageFor(error, foundRegions);
       if (!found.length) {
         const names = await loadNames();
         const hit = names.get(error.payload.base);
@@ -237,16 +240,23 @@ async function run(rawInput, region) {
       if (found.length) {
         try {
           const elsewhere = found[0];
-          const card = await cardFromRegion(error.payload.base, elsewhere, {
-            source: `Listed in ${elsewhere}`,
+          const card = await cardFromRegion(elsewhere.sku, elsewhere.region, {
+            source: `Listed in ${elsewhere.region}`,
             hash: error.payload.hash || null,
           });
           state.card = card;
-          renderCard(el.card, card, `Not sold in ${region} — showing the ${elsewhere} listing.`, {
+          renderCard(el.card, card, `Not sold in ${region} — showing the ${elsewhere.region} listing.`, {
             copy: copyText,
             copyShare: () => copyText(shareUrl()),
           });
           showPermalink();
+          remember({
+            input: value,
+            region,
+            name: card.name,
+            price: card.price,
+            image: card.image,
+          });
           startAvailability(card, value, region);
           return;
         } catch { /* fall through to the empty card */ }
@@ -457,6 +467,7 @@ async function boot() {
   if (isRegion(region)) {
     state.region = region;
     renderChips(el.chips, REGIONS, state.region, pickRegion);
+    renderCountdown(el.countdown, state.region);
   }
   const seed = hash || sku;
   if (seed) {

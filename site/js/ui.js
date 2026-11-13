@@ -158,8 +158,9 @@ export function renderRegionRows(tbody, rows, regionNames, now = Date.now()) {
       : '';
 
     const info = closureFor(row.region);
-    const daysLeft = Math.floor((Date.parse(info.target) - now) / DAY);
-    const closes = daysLeft > 0 ? `${info.label} · ${daysLeft}d` : 'closed';
+    const leftMs = Date.parse(info.target) - now;
+    const daysLeft = Math.floor(leftMs / DAY);
+    const closes = leftMs > 0 ? `${info.label} · ${daysLeft}d` : 'closed';
 
     tr.innerHTML = `<td>
         <span class="font-medium">${esc(label)}</span>
