@@ -36,9 +36,10 @@ function esc(value) {
 
 function imageUrl(item) {
   const images = Array.isArray(item.images) ? item.images : [];
-  if (!images.length) return null;
+  const lastWithUrl = [...images].reverse().find((img) => img && typeof img.url === 'string');
+  if (!lastWithUrl) return null;
   try {
-    const url = new URL(images[images.length - 1].url);
+    const url = new URL(lastWithUrl.url);
     const host = url.hostname.toLowerCase();
     if (url.protocol === 'https:' && (host.endsWith('.playstation.net') || host.endsWith('.playstation.com'))) {
       return url.toString();
@@ -49,7 +50,8 @@ function imageUrl(item) {
 
 async function search(start) {
   const lang = LANG[state.region] || 'en';
-  const url = `${SEARCH}/${state.region}/${lang}/19/${encodeURIComponent(state.query)}`
+  const query = state.query.replace(/[/\\?]+/g, ' ').trim();
+  const url = `${SEARCH}/${state.region}/${lang}/19/${encodeURIComponent(query)}`
     + `?top_category=avatar&start=${start}`;
   const res = await fetch(url, { headers: { Accept: 'application/json' } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -197,7 +199,8 @@ el.more.addEventListener('click', () => load(false));
 
 async function boot() {
   const params = new URLSearchParams(location.search);
-  if (params.get('region')) state.region = params.get('region').toUpperCase();
+  const r = (params.get('region') || '').toUpperCase();
+  if (REGIONS.some((item) => item.code === r)) state.region = r;
   if (params.get('q')) {
     el.q.value = params.get('q');
     state.query = params.get('q');

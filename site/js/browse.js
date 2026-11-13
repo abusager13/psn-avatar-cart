@@ -36,7 +36,7 @@ async function loadCatalog() {
   for (let i = 1; i < lines.length; i += 1) {
     const [sku, name, price, regions] = lines[i].split('\t');
     if (!sku || !regions) continue;
-    rows.push({ sku, name: name || '', price: price || '', regions: regions.split(' ') });
+    rows.push({ sku, name: name || '', price: price || '', regions: regions.trim().split(' ') });
   }
   return rows;
 }

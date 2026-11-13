@@ -1,5 +1,6 @@
 {
   "name": "ps3-avatars",
+  "type": "module",
   "private": true,
   "description": "PSNA hash / SKU / .edat to a PlayStation Store cart link",
   "scripts": {

@@ -12,7 +12,7 @@ export const ERR = {
   NOT_FOUND: -6,
 };
 
-const ok = (value) => ({ ok: true, code: 0, value });
+const ok = (value, extra = {}) => ({ ok: true, code: 0, value, ...extra });
 const fail = (code) => ({ ok: false, code, value: null });
 
 /* ---------------------------------------------------------------- input */
@@ -57,10 +57,12 @@ function normalizeInput(raw) {
 /** `UP1004-BLUS30418_00-AVARDRSHADOWWOLF-U099` -> `...` without `-U099`. */
 function stripVariant(sku) {
   const s = String(sku ?? '').trim();
-  const cut = s.lastIndexOf('-');
-  if (cut > 0) {
-    const tail = s.slice(cut + 1);
-    if (tail.length === 4 && /^[A-Za-z][A-Za-z0-9]{3}$/.test(tail)) return ok(s.slice(0, cut));
+  if ((s.match(/-/g) || []).length >= 3) {
+    const cut = s.lastIndexOf('-');
+    if (cut > 0) {
+      const tail = s.slice(cut + 1);
+      if (tail.length === 4 && /^[A-Za-z][A-Za-z0-9]{3}$/.test(tail)) return ok(s.slice(0, cut));
+    }
   }
   return ok(s);
 }
@@ -69,8 +71,8 @@ function stripVariant(sku) {
 function homeRegion(sku) {
   const s = String(sku ?? '').toUpperCase();
   const prefix = s.slice(0, 2);
-  if (prefix === 'EP' || prefix === 'ET') return ok('GB');   // ET = European trial
-  if (prefix === 'JP') return ok('JP');
+  if (prefix.startsWith('E')) return ok('GB');   // EP, ET (European trial), ES (Europe)
+  if (prefix === 'JP' || prefix === 'IP') return ok('JP'); // IP = Sony Japan torne
   if (prefix === 'HP') return ok('HK');
   return ok('US');
 }
@@ -110,7 +112,7 @@ function namesMatch(a, b) {
 export function isContentId(value) {
   // Base ID, optionally followed by the 4-character variant Sony returns as
   // `default_sku.id` (-U099, -E001). Anything else is rejected.
-  return /^[A-Z]{2}\d{4}-[A-Z0-9]{4,}_\d{2}-[A-Z0-9]+(-[A-Z0-9]{4})?$/.test(String(value ?? '').trim());
+  return /^[A-Z]{2}\d{4}-[A-Z0-9]{4,}_\d{2}-[A-Z0-9_]+(-[A-Z0-9]{4})?$/.test(String(value ?? '').trim());
 }
 
 /** The cart deep-link Sony's own store uses. */
@@ -151,8 +153,9 @@ function buildIndex(tsv) {
     const fields = lines[i].split('\t');
     if (fields.length < 3) continue;
     const hash = (fields[0] || '').trim();
+    const game = (fields[1] || '').trim();
     const sku = (fields[2] || '').trim();
-    if (hash && sku) map.set(hash.toUpperCase(), sku);
+    if (hash && sku) map.set(hash.toUpperCase(), { sku, game });
   }
   index = map;
   return map.size;
@@ -161,8 +164,8 @@ function buildIndex(tsv) {
 function lookup(hash) {
   if (!index) return fail(ERR.NO_INDEX);
   const key = String(hash ?? '').trim().toUpperCase();
-  const sku = index.get(key);
-  return sku ? ok(sku) : fail(ERR.NOT_FOUND);
+  const hit = index.get(key);
+  return hit ? ok(hit.sku, { game: hit.game }) : fail(ERR.NOT_FOUND);
 }
 
 /* ---------------------------------------------------------------- api */

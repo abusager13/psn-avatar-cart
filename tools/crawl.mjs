@@ -169,8 +169,9 @@ async function main() {
     const merged = new Map(rows.filter((r) => r[3] === region).map((r) => [r[0], r]));
     for (const [sku, v] of found) merged.set(sku, [sku, v.name, v.price, region]);
 
+    rows = [...keep, ...merged.values()];
     await writeFile(STORE, 'sku\tname\tprice\tregion\tin_archive\n'
-      + [...keep, ...merged.values()].map((r) => r.slice(0, 4).join('\t') + '\t' + (r[4] || 'no')).join('\n') + '\n');
+      + rows.map((r) => r.slice(0, 4).join('\t') + '\t' + (r[4] || 'no')).join('\n') + '\n');
     console.log(`${region}: ${merged.size} listings on file (${found.size} seen this run)`);
   }
 

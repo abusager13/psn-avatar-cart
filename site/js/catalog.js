@@ -213,13 +213,15 @@ function trustedImage(value) {
 function toCard(data, region, extra = {}) {
   const sku = data?.default_sku || {};
   const images = Array.isArray(data?.images) ? data.images : [];
+  const lastWithUrl = [...images].reverse().find((img) => img && typeof img.url === 'string');
+  const cartSku = sku.id || extra.baseSku || '';
   return {
     name: data?.name || '(unnamed)',
     platform: (data?.playable_platform || ['?'])[0],
     price: sku.display_price || '—',
     baseSku: extra.baseSku || sku.id?.replace(/-[A-Z][A-Z0-9]{3}$/, '') || '',
-    link: core.cartLink(sku.id || '').value || '',
-    image: images.length ? trustedImage(images[images.length - 1].url) : null,
+    link: core.cartLink(cartSku).value || '',
+    image: lastWithUrl ? trustedImage(lastWithUrl.url) : null,
     region,
     ...extra,
   };
@@ -243,6 +245,7 @@ export async function resolveInput(rawInput, region) {
       throw new LookupError('notInArchive', { hash: cleaned });
     }
     sku = hit.value;
+    game = hit.game || null;
     hash = cleaned;
     source = 'PSNA hash → SKU';
   } else if (core.isContentId(cleaned)) {
@@ -302,9 +305,10 @@ async function findTwin(base, home, targetRegion, knownName) {
 
   let payload;
   const lang = REGION_LANG[targetRegion] || 'en';
+  const query = sourceName.replace(/[/\\?]+/g, ' ').trim();
   try {
     const response = await fetch(
-      `${SEARCH}/${targetRegion}/${lang}/19/${encodeURIComponent(sourceName)}?platform=ps3`
+      `${SEARCH}/${targetRegion}/${lang}/19/${encodeURIComponent(query)}?platform=ps3`
     );
     if (!response.ok) return null;
     payload = await response.json();
@@ -377,6 +381,7 @@ export async function availability(base, sourceName, home, onRow) {
         onRow({
           region: code,
           status: 'yes',
+          sku: base,
           price: sku.display_price || '—',
           link: core.cartLink(sku.id || '').value || '',
         });
@@ -392,6 +397,7 @@ export async function availability(base, sourceName, home, onRow) {
             onRow({
               region: code,
               status: 'twin',
+              sku: twin.sku,
               price: sku.display_price || '—',
               link: core.cartLink(sku.id || '').value || '',
             });
