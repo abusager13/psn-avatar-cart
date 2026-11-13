@@ -3,7 +3,7 @@
 A web tool that turns a **PSNA hash**, a **PSN SKU**, or a **`.edat` file** into a working
 PlayStation Store cart link — and shows you which store regions still sell it.
 
-### → **https://abusager13.github.io/psn-avatar-cart/**
+### → **https://virlwing.github.io/psn-avatar-cart/**
 
 Static site. No install, no login, no backend.
 
